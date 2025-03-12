@@ -3,5 +3,10 @@
     "next/core-web-vitals",
     "next/typescript",
     "plugin:@tanstack/eslint-plugin-query/recommended"
-  ]
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": [
+      "off"
+    ]
+  }
 }

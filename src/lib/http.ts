@@ -127,6 +127,7 @@ const request = async <Response>(
                     try {
                         await clientLogoutRequest
                     } catch (error) {
+                        console.log('Error when logout::: ', error)
                     } finally {
                         localStorage.removeItem('accessToken')
                         localStorage.removeItem('refreshToken')
