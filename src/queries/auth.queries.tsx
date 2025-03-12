@@ -6,3 +6,9 @@ export const useLoginMutation = () => {
         mutationFn: authClientServices.login,
     })
 }
+
+export const useLogoutMutation = () => {
+    return useMutation({
+        mutationFn: authClientServices.logout,
+    })
+}

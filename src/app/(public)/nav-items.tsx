@@ -27,7 +27,7 @@ const menuItems = [
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const [isAuth, setIsAuth] = useState<Boolean>(false)
+  const [isAuth, setIsAuth] = useState(false)
 
   useEffect(() => {
     setIsAuth(!!getAccessTokenFromLocalStorage())
