@@ -1,8 +1,9 @@
 'use client'
 
 import { getAccessTokenFromLocalStorage } from '@/lib/utils'
+import { useGetMeQuery } from '@/queries/account.queries'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 
 const menuItems = [
   {
