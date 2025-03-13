@@ -1,4 +1,5 @@
 import accountApiServices from "@/api/services/accountApi.services"
+import accountClientServices from "@/services/accountClient.services"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useGetMeQuery = () => {
@@ -11,5 +12,11 @@ export const useGetMeQuery = () => {
 export const useUpdateMeMutation = () => {
     return useMutation({
         mutationFn: accountApiServices.updateMe,
+    })
+}
+
+export const useChangePasswordMutation = () => {
+    return useMutation({
+        mutationFn: accountClientServices.changePassword,
     })
 }

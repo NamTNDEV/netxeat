@@ -8,8 +8,13 @@ import { useForm } from 'react-hook-form'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { useChangePasswordMutation } from '@/queries/account.queries'
+import { toast } from 'sonner'
+import { handleErrorApi, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from '@/lib/utils'
 
 export default function ChangePasswordForm() {
+  const changePasswordMutation = useChangePasswordMutation()
+
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
@@ -19,9 +24,34 @@ export default function ChangePasswordForm() {
     }
   })
 
+  const handleSubmit = async (body: ChangePasswordBodyType) => {
+    if (changePasswordMutation.isPending) return
+    try {
+      const result = await changePasswordMutation.mutateAsync(body)
+      const { accessToken, refreshToken } = result.payload.data
+      setAccessTokenToLocalStorage(accessToken)
+      setRefreshTokenToLocalStorage(refreshToken)
+      toast.success('Đổi mật khẩu thành công')
+      form.reset()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
+  const handleReset = () => {
+    form.reset()
+  }
+
   return (
     <Form {...form}>
-      <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
+      <form
+        noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'
+        onSubmit={form.handleSubmit(handleSubmit)}
+        onReset={handleReset}
+      >
         <Card className='overflow-hidden' x-chunk='dashboard-07-chunk-4'>
           <CardHeader>
             <CardTitle>Đổi mật khẩu</CardTitle>
@@ -69,10 +99,12 @@ export default function ChangePasswordForm() {
                 )}
               />
               <div className=' items-center gap-2 md:ml-auto flex'>
-                <Button variant='outline' size='sm'>
+                <Button variant='outline' size='sm' type='reset' onClick={handleReset} disabled={changePasswordMutation.isPending}>
                   Hủy
                 </Button>
-                <Button size='sm'>Lưu thông tin</Button>
+                <Button size='sm' type='submit' disabled={changePasswordMutation.isPending}>
+                  Lưu thông tin
+                </Button>
               </div>
             </div>
           </CardContent>
