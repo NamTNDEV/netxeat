@@ -9,11 +9,17 @@ import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.sche
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { use, useEffect, useMemo, useRef, useState } from 'react'
-import { useGetMeQuery } from '@/queries/account.queries'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useGetMeQuery, useUpdateMeMutation } from '@/queries/account.queries'
+import { useUploadMediaMutation } from '@/queries/media.querires'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function UpdateProfileForm() {
-  const { data } = useGetMeQuery()
+  const { data, refetch } = useGetMeQuery()
+  const updateMeMutation = useUpdateMeMutation()
+  const updateMediaMutation = useUploadMediaMutation()
+
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploadAvatarState, setUploadAvatarState] = useState<File | null>(null)
 
@@ -21,7 +27,7 @@ export default function UpdateProfileForm() {
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
       name: '',
-      avatar: ''
+      avatar: undefined
     }
   })
 
@@ -40,14 +46,50 @@ export default function UpdateProfileForm() {
       const { avatar, name } = data.payload.data
       form.reset({
         name,
-        avatar: avatar ?? ''
+        avatar: avatar ?? undefined
       })
     }
-  }, [data])
+  }, [data, form])
+
+  const handleReset = () => {
+    form.reset()
+    setUploadAvatarState(null)
+  }
+
+  const handleSubmitForm = async (body: UpdateMeBodyType) => {
+    if (updateMediaMutation.isPending) return
+    try {
+      let uploadBody = body;
+      if (uploadAvatarState) {
+        const formData = new FormData()
+        formData.append('file', uploadAvatarState)
+        const { payload } = await updateMediaMutation.mutateAsync(formData)
+        uploadBody = {
+          ...body,
+          avatar: payload.data
+        }
+      }
+      await updateMeMutation.mutateAsync(uploadBody)
+      toast.success('Cập nhật thông tin thành công')
+      refetch()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
 
   return (
     <Form {...form}>
-      <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
+      <form
+        noValidate
+        className='grid auto-rows-max items-start gap-4 md:gap-8'
+        onReset={handleReset}
+        onSubmit={form.handleSubmit(handleSubmitForm, (error) => {
+          console.log("Error::: ", error)
+        })}
+      >
         <Card x-chunk='dashboard-07-chunk-0'>
           <CardHeader>
             <CardTitle>Thông tin cá nhân</CardTitle>
