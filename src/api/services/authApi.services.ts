@@ -1,5 +1,5 @@
 import http from "@/lib/http";
-import { LoginBodyType, LoginResType, LogoutBodyType } from "@/schemaValidations/auth.schema";
+import { LoginBodyType, LoginResType, LogoutBodyType, RefreshTokenBodyType, RefreshTokenResType } from "@/schemaValidations/auth.schema";
 
 const prefix = "/auth";
 
@@ -10,6 +10,7 @@ const authApiServices = {
             Authorization: `Bearer ${body.accessToken}`,
         },
     }),
+    refreshToken: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>(`${prefix}/refresh-token`, body),
 };
 
 export default authApiServices;
