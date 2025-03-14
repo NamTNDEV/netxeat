@@ -3,6 +3,8 @@ import { UseFormSetError } from "react-hook-form"
 import { twMerge } from "tailwind-merge"
 import { EntityError } from "./http"
 import { toast } from "sonner"
+import jwt from "jsonwebtoken"
+import authClientServices from "@/services/authClient.services"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -29,6 +31,35 @@ export const handleErrorApi = ({
     toast.error(error?.payload?.message || "Internal Server Error", {
       duration: toasterDuration
     })
+  }
+}
+
+export const checkAndRefreshToken = async (handler?: {
+  onError?: () => void
+  onSuccess?: () => void
+}) => {
+  const accessToken = getAccessTokenFromLocalStorage()
+  const refreshToken = getRefreshTokenFromLocalStorage()
+  if (!accessToken || !refreshToken) return
+  const decodedAccessToken = jwt.decode(accessToken) as {
+    exp: number,
+    iat: number
+  }
+  const decodedRefreshToken = jwt.decode(refreshToken) as {
+    exp: number,
+    iat: number
+  }
+  const currentTime = Date.now() / 1000
+  if (decodedRefreshToken.exp <= currentTime) return
+  if (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
+    try {
+      const res = await authClientServices.refreshToken()
+      setAccessTokenToLocalStorage(res.payload.data.accessToken)
+      setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
+      handler?.onSuccess && handler.onSuccess()
+    } catch (error) {
+      handler?.onError && handler.onError()
+    }
   }
 }
 
