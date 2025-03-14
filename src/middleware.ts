@@ -6,12 +6,18 @@ const publicRoutes = ['/login']
 
 export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
-    const isAuth = !!request.cookies.get('accessToken')?.value
-    if (privateRoutes.some(route => pathname.startsWith(route) && !isAuth)) {
+    const accessToken = request.cookies.get('accessToken')?.value
+    const refreshToken = request.cookies.get('refreshToken')?.value
+    if (privateRoutes.some(route => pathname.startsWith(route) && !refreshToken)) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
-    if (publicRoutes.some(route => pathname.startsWith(route) && isAuth)) {
+    if (publicRoutes.some(route => pathname.startsWith(route) && refreshToken)) {
         return NextResponse.redirect(new URL('/', request.url))
+    }
+    if (privateRoutes.some(route => pathname.startsWith(route)) && refreshToken && !accessToken) {
+        const url = new URL('/logout', request.url)
+        url.searchParams.set('refreshToken', refreshToken)
+        return NextResponse.redirect(url)
     }
     return NextResponse.next()
 }
