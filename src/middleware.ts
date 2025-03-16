@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
         url.searchParams.set('isClearTokens', 'true')
         return NextResponse.redirect(url)
     }
-    if (publicRoutes.some(route => pathname.startsWith(route) && refreshToken)) {
+    if (publicRoutes.some(route => pathname.startsWith(route) && refreshToken && accessToken)) {
         return NextResponse.redirect(new URL('/', request.url))
     }
     if (privateRoutes.some(route => pathname.startsWith(route)) && refreshToken && !accessToken) {

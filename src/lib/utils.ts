@@ -51,15 +51,18 @@ export const checkAndRefreshToken = async (handler?: {
   }
   const currentTime = new Date().getTime() / 1000 - 1
   // const currentTime = Date.now() / 1000
-  if (decodedRefreshToken.exp <= currentTime) return
+  if (decodedRefreshToken.exp <= currentTime) {
+    removeAccessTokenFromLocalStorage()
+    removeRefreshTokenFromLocalStorage()
+    return handler?.onError && handler.onError()
+  }
   if (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
     try {
       const res = await authClientServices.refreshToken()
       setAccessTokenToLocalStorage(res.payload.data.accessToken)
       setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
-      handler?.onSuccess && handler.onSuccess()
+      return handler?.onSuccess && handler.onSuccess()
     } catch (error) {
-      handler?.onError && handler.onError()
       removeAccessTokenFromLocalStorage()
       removeRefreshTokenFromLocalStorage()
       return handler?.onError && handler.onError()

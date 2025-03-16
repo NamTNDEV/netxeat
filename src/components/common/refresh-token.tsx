@@ -27,7 +27,7 @@ const RefreshToken = () => {
                 }
             }), TIMEOUT)
         return () => clearInterval(interval)
-    }, [pathname])
+    }, [router, pathname])
 
     return null
 }
