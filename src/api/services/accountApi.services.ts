@@ -1,5 +1,5 @@
 import http from "@/lib/http";
-import { AccountResType, ChangePasswordV2BodyType, ChangePasswordV2ResType, UpdateMeBodyType } from "@/schemaValidations/account.schema";
+import { AccountListResType, AccountResType, ChangePasswordV2BodyType, ChangePasswordV2ResType, CreateEmployeeAccountBodyType, UpdateEmployeeAccountBodyType, UpdateMeBodyType } from "@/schemaValidations/account.schema";
 
 const prefix = "/accounts";
 
@@ -11,6 +11,11 @@ const accountApiServices = {
             Authorization: `Bearer ${accessToken}`,
         }
     }),
+    getListAccount: () => http.get<AccountListResType[]>(`${prefix}`),
+    getAccount: (id: number) => http.get<AccountResType>(`${prefix}/detail/${id}`),
+    createAccount: (body: CreateEmployeeAccountBodyType) => http.post<AccountResType>(`${prefix}`, body),
+    updateAccount: (id: number, body: UpdateEmployeeAccountBodyType) => http.put<AccountResType>(`${prefix}/detail/${id}`, body),
+    deleteAccount: (id: number) => http.delete<AccountResType>(`${prefix}/detail/${id}`),
 };
 
 export default accountApiServices;
