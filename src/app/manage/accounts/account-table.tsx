@@ -63,12 +63,8 @@ const AccountTableContext = createContext<{
 })
 
 export const columns: ColumnDef<AccountType>[] = [
-  // {
-  //   accessorKey: 'id',
-  //   header: 'ID'
-  // },
   {
-    id: 'STT',
+    id: 'stt',
     header: 'STT',
     cell: ({ row }) => <div className='text-left pl-4'>{row.index + 1}</div>
   },

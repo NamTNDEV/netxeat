@@ -9,13 +9,19 @@ import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getVietnameseDishStatus } from '@/lib/utils'
+import { getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
 import { CreateDishBody, CreateDishBodyType } from '@/schemaValidations/dish.schema'
 import { DishStatus, DishStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useUploadMediaMutation } from '@/queries/media.querires'
+import { useCreateDishMutation } from '@/queries/dish.queries'
+import { toast } from 'sonner'
 
 export default function AddDish() {
+  const createDishMutation = useCreateDishMutation()
+  const uploadMediaMutation = useUploadMediaMutation()
+
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const imageInputRef = useRef<HTMLInputElement | null>(null)
@@ -25,7 +31,7 @@ export default function AddDish() {
       name: '',
       description: '',
       price: 0,
-      image: '',
+      image: undefined,
       status: DishStatus.Unavailable
     }
   })
@@ -38,20 +44,58 @@ export default function AddDish() {
     return image
   }, [file, image])
 
+  const handleSubmit = async (data: CreateDishBodyType) => {
+    if (uploadMediaMutation.isPending || createDishMutation.isPending) return
+    try {
+      let body = data
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file);
+        const media = await uploadMediaMutation.mutateAsync(formData)
+        body = {
+          ...body,
+          image: media.payload.data
+        }
+      }
+      const result = await createDishMutation.mutateAsync(body)
+      toast.success(result.payload.message)
+      handleReset()
+      setOpen(false)
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
+  const handleReset = () => {
+    form.reset()
+    setFile(null)
+  }
+
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog onOpenChange={(value: boolean) => {
+      if (!value) {
+        handleReset()
+      }
+      setOpen(value)
+    }} open={open}>
       <DialogTrigger asChild>
         <Button size='sm' className='h-7 gap-1'>
           <PlusCircle className='h-3.5 w-3.5' />
           <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>Thêm món ăn</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Thêm món ăn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-dish-form'>
+          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-dish-form'
+            onReset={handleReset}
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}

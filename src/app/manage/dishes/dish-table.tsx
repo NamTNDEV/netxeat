@@ -61,8 +61,9 @@ const DishTableContext = createContext<{
 
 export const columns: ColumnDef<DishItem>[] = [
   {
-    accessorKey: 'id',
-    header: 'ID'
+    id: 'stt',
+    header: "STT",
+    cell: ({ row }) => <div className='text-left pl-4'>{row.index + 1}</div>
   },
   {
     accessorKey: 'image',
