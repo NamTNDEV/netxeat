@@ -58,12 +58,15 @@ export default function AddEmployee() {
   const handleSubmit = async (data: CreateEmployeeAccountBodyType) => {
     if (createAccountMutation.isPending || uploadMediaMutation.isPending) return
     try {
-      let body = { ...data }
+      let body = data
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
         const media = await uploadMediaMutation.mutateAsync(formData)
-        body.avatar = media.payload.data
+        body = {
+          ...data,
+          avatar: media.payload.data
+        }
       }
       const result = await createAccountMutation.mutateAsync(body)
       toast.success(result.payload.message)

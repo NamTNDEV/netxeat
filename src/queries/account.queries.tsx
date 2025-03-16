@@ -29,10 +29,11 @@ export const useGetListAccountQuery = () => {
     })
 }
 
-export const useGetAccountQuery = (id: number) => {
+export const useGetAccountQuery = (id: number | undefined) => {
     return useQuery({
         queryKey: ['account', id],
-        queryFn: () => accountApiServices.getAccount(id),
+        queryFn: () => accountApiServices.getAccount(id as number),
+        enabled: Boolean(id)
     }
     )
 }

@@ -13,11 +13,15 @@ import { Label } from '@/components/ui/label'
 import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
+import { useGetAccountQuery, useUpdateAccountMutation } from '@/queries/account.queries'
+import { useUploadMediaMutation } from '@/queries/media.querires'
+import { handleErrorApi } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function EditEmployee({
   id,
@@ -30,6 +34,9 @@ export default function EditEmployee({
 }) {
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
+  const { data } = useGetAccountQuery(id)
+  const updateEmployeeAccountMutation = useUpdateAccountMutation()
+  const uploadMediaMutation = useUploadMediaMutation()
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: {
@@ -44,6 +51,21 @@ export default function EditEmployee({
   const avatar = form.watch('avatar')
   const name = form.watch('name')
   const changePassword = form.watch('changePassword')
+
+  useEffect(() => {
+    if (data) {
+      const { avatar, email, name } = data.payload.data
+      form.reset({
+        name,
+        email,
+        avatar: avatar || undefined,
+        changePassword: form.getValues('changePassword'),
+        password: form.getValues('password'),
+        confirmPassword: form.getValues('confirmPassword')
+      })
+    }
+  }, [data, form])
+
   const previewAvatarFromFile = useMemo(() => {
     if (file) {
       return URL.createObjectURL(file)
@@ -51,12 +73,48 @@ export default function EditEmployee({
     return avatar
   }, [file, avatar])
 
+  const handleReset = () => {
+    setId(undefined)
+    setFile(null)
+  }
+
+  const handleSubmit = async (data: UpdateEmployeeAccountBodyType) => {
+    if (updateEmployeeAccountMutation.isPending || uploadMediaMutation.isPending) return
+    try {
+      let body: UpdateEmployeeAccountBodyType & { id: number } = {
+        ...data,
+        id: id as number
+      }
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const media = await uploadMediaMutation.mutateAsync(formData)
+        body = {
+          ...body,
+          avatar: media.payload.data
+        }
+      }
+      const result = await updateEmployeeAccountMutation.mutateAsync(body)
+      toast.success(result.payload.message)
+      form.reset()
+      handleReset()
+      if (onSubmitSuccess) {
+        onSubmitSuccess()
+      }
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
   return (
     <Dialog
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          setId(undefined)
+          handleReset()
         }
       }}
     >
@@ -66,7 +124,9 @@ export default function EditEmployee({
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-employee-form'>
+          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-employee-form'
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}
