@@ -41,7 +41,7 @@ export const useUpdateDishMutation = () => {
     })
 }
 
-export const useDeleteMutation = () => {
+export const useDeleteDishMutation = () => {
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: dishApiServices.deleteDish,
