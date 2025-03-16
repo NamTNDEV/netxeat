@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
+import { useGetListAccountQuery } from '@/queries/account.queries'
 
 
 type AccountItem = AccountListResType['data'][0]
@@ -60,9 +61,14 @@ const AccountTableContext = createContext<{
 })
 
 export const columns: ColumnDef<AccountType>[] = [
+  // {
+  //   accessorKey: 'id',
+  //   header: 'ID'
+  // },
   {
-    accessorKey: 'id',
-    header: 'ID'
+    id: 'STT',
+    header: 'STT',
+    cell: ({ row }) => <div className='text-left pl-4'>{row.index + 1}</div>
   },
   {
     accessorKey: 'avatar',
@@ -160,13 +166,14 @@ function AlertDialogDeleteAccount({
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10
 export default function AccountTable() {
+  const getListAccountQuery = useGetListAccountQuery()
   const searchParam = useSearchParams()
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
   const pageIndex = page - 1
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
+  const data = getListAccountQuery.data?.payload.data ?? []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
