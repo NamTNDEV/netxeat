@@ -9,7 +9,9 @@ export function middleware(request: NextRequest) {
     const accessToken = request.cookies.get('accessToken')?.value
     const refreshToken = request.cookies.get('refreshToken')?.value
     if (privateRoutes.some(route => pathname.startsWith(route) && !refreshToken)) {
-        return NextResponse.redirect(new URL('/login', request.url))
+        const url = new URL('/login', request.url)
+        url.searchParams.set('isClearTokens', 'true')
+        return NextResponse.redirect(url)
     }
     if (publicRoutes.some(route => pathname.startsWith(route) && refreshToken)) {
         return NextResponse.redirect(new URL('/', request.url))

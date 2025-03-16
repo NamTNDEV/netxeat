@@ -5,11 +5,15 @@ const prefix = "/auth";
 
 const authApiServices = {
     login: (body: LoginBodyType) => http.post<LoginResType>(`${prefix}/login`, body),
-    logout: (body: LogoutBodyType & { accessToken: string }) => http.post(`${prefix}/logout`, body, {
-        headers: {
-            Authorization: `Bearer ${body.accessToken}`,
-        },
-    }),
+    logout: (body: LogoutBodyType & { accessToken: string }) => {
+        return http.post(`${prefix}/logout`, {
+            refreshToken: body.refreshToken,
+        }, {
+            headers: {
+                Authorization: `Bearer ${body.accessToken}`,
+            },
+        });
+    },
     refreshToken: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>(`${prefix}/refresh-token`, body),
 };
 

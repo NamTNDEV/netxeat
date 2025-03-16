@@ -1,12 +1,13 @@
 'use client'
 import { checkAndRefreshToken, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from "@/lib/utils"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 const UNAUTHENTICATED_PATHS = ['/login', '/register', '/refresh-token']
 const TIMEOUT = (30 * 60 * 1000) / 6
 
 const RefreshToken = () => {
+    const router = useRouter()
     const pathname = usePathname()
 
     useEffect(() => {
@@ -15,9 +16,16 @@ const RefreshToken = () => {
         checkAndRefreshToken({
             onError: () => {
                 clearInterval(interval)
+                router.push('/login')
             }
         })
-        interval = setInterval(checkAndRefreshToken, 1000)
+        interval = setInterval(() =>
+            checkAndRefreshToken({
+                onError: () => {
+                    clearInterval(interval)
+                    router.push('/login')
+                }
+            }), TIMEOUT)
         return () => clearInterval(interval)
     }, [pathname])
 

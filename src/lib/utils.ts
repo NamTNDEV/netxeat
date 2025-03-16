@@ -49,7 +49,8 @@ export const checkAndRefreshToken = async (handler?: {
     exp: number,
     iat: number
   }
-  const currentTime = Date.now() / 1000
+  const currentTime = new Date().getTime() / 1000 - 1
+  // const currentTime = Date.now() / 1000
   if (decodedRefreshToken.exp <= currentTime) return
   if (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
     try {
@@ -59,6 +60,9 @@ export const checkAndRefreshToken = async (handler?: {
       handler?.onSuccess && handler.onSuccess()
     } catch (error) {
       handler?.onError && handler.onError()
+      removeAccessTokenFromLocalStorage()
+      removeRefreshTokenFromLocalStorage()
+      return handler?.onError && handler.onError()
     }
   }
 }

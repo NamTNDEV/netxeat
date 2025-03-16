@@ -15,18 +15,21 @@ import { useLogoutMutation } from '@/queries/auth.queries'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useGetMeQuery } from '@/queries/account.queries'
+import { useAuthContext } from '@/providers/auth-provider'
 
 export default function DropdownAvatar() {
   const route = useRouter();
   const logoutMutation = useLogoutMutation();
   const { data } = useGetMeQuery();
   const account = data?.payload.data;
+  const { handleAuth } = useAuthContext();
 
   const handleLogout = async () => {
     if (logoutMutation.isPending) return;
     try {
       await logoutMutation.mutateAsync();
       toast.success('Đăng xuất thành công');
+      handleAuth(false);
       route.push('/login');
     } catch (error) {
       handleErrorApi({
