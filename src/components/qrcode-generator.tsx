@@ -6,7 +6,6 @@ import { useEffect, useRef } from 'react'
 export type QRCodeTableProps = {
     token: string,
     tableNumber: number,
-    width: number,
 }
 
 export default function QRCodeTable({ payload, width = 240 }: { payload: QRCodeTableProps, width?: number }) {
