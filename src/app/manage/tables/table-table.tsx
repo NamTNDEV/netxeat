@@ -63,7 +63,7 @@ export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'number',
     header: 'Số bàn',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('number')}</div>
+    cell: ({ row }) => <div className='capitalize pl-4'>{row.getValue('number')}</div>
   },
   {
     accessorKey: 'capacity',
@@ -84,7 +84,7 @@ export const columns: ColumnDef<TableItem>[] = [
         tableNumber: row.getValue('number')
       } as QRCodeTableProps
       return (
-        <div>
+        <div className='py-4'>
           <QRCodeTable
             payload={payload}
           />
