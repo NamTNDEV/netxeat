@@ -1,6 +1,19 @@
+import { dishApiServices } from '@/api/services/dishApi.services'
+import { formatCurrency } from '@/lib/utils'
+import { DishListResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
 
-export default function Home() {
+export default async function Home() {
+  let dishList: DishListResType['data'] = []
+
+  try {
+    const res = await dishApiServices.getDishes()
+    const { payload: { data } } = res
+    dishList = data
+  } catch (error) {
+    return <div>Something went wrong</div>
+  }
+
   return (
     <div className='w-full space-y-4'>
       <div className='relative'>
@@ -19,29 +32,40 @@ export default function Home() {
           <p className='text-center text-sm sm:text-base mt-4'>Vị ngon, trọn khoảnh khắc</p>
         </div>
       </div>
-      <section className='space-y-10 py-16'>
-        <h2 className='text-center text-2xl font-bold'>Đa dạng các món ăn</h2>
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-10'>
-          {Array(4)
-            .fill(0)
-            .map((_, index) => (
-              <div className='flex gap-4 w' key={index}>
-                <div className='flex-shrink-0'>
-                  <Image
-                    width={150}
-                    height={150}
-                    alt='Bánh mì'
-                    src='https://ik.imagekit.io/freeflo/production/6b91c700-92c4-4601-8e96-37d84ac3c28c.png?tr=w-2048,q-75&alt=media&pr-true'
-                    className='object-cover w-full h-full rounded-md'
-                  />
-                </div>
-                <div className='space-y-1'>
-                  <h3 className='text-xl font-semibold'>Bánh mì</h3>
-                  <p className=''>Bánh mì sandwidch</p>
-                  <p className='font-semibold'>123,123đ</p>
-                </div>
+      <section className="space-y-10 py-16">
+        <h2 className="text-center text-2xl font-bold text-white">
+          Đa dạng các món ăn
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {dishList.map((dishItem) => (
+            <div
+              key={dishItem.id}
+              className="flex flex-col sm:flex-row bg-gray-900 rounded-lg p-4 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              {/* Ảnh món ăn */}
+              <div className="w-full sm:w-48 h-48 overflow-hidden rounded-md flex-shrink-0">
+                <Image
+                  width={200}
+                  height={200}
+                  quality={100}
+                  alt={dishItem.name}
+                  src={dishItem.image}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            ))}
+
+              {/* Thông tin món ăn */}
+              <div className="flex flex-col justify-between px-4 py-2 w-full">
+                <div className='flex flex-col space-y-1'>
+                  <h3 className="text-xl font-semibold text-white">{dishItem.name}</h3>
+                  <p className="pl-2 text-gray-400 line-clamp-3">{dishItem.description}</p>
+                </div>
+                <p className="font-semibold text-yellow-400">
+                  {formatCurrency(dishItem.price)}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>
