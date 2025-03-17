@@ -1,4 +1,5 @@
 import { dishApiServices } from '@/api/services/dishApi.services'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatCurrency } from '@/lib/utils'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
@@ -38,36 +39,44 @@ export default async function Home() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {dishList.map((dishItem) => (
-            <div
-              key={dishItem.id}
-              className="flex flex-col sm:flex-row bg-gray-900 rounded-lg p-4 hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              {/* Ảnh món ăn */}
-              <div className="w-full sm:w-48 h-48 overflow-hidden rounded-md flex-shrink-0">
-                <Image
-                  width={200}
-                  height={200}
-                  quality={100}
-                  alt={dishItem.name}
-                  src={dishItem.image}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            <TooltipProvider key={dishItem.id}>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div
+                    className="flex flex-col sm:flex-row bg-gray-900 rounded-lg p-4 hover:opacity-80 transition-opacity cursor-pointer"
+                  >
+                    {/* Ảnh món ăn */}
+                    <div className="w-full sm:w-48 h-48 overflow-hidden rounded-md flex-shrink-0">
+                      <Image
+                        width={200}
+                        height={200}
+                        quality={100}
+                        alt={dishItem.name}
+                        src={dishItem.image}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-              {/* Thông tin món ăn */}
-              <div className="flex flex-col justify-between px-4 py-2 w-full">
-                <div className='flex flex-col space-y-1'>
-                  <h3 className="text-xl font-semibold text-white">{dishItem.name}</h3>
-                  <p className="pl-2 text-gray-400 line-clamp-3">{dishItem.description}</p>
-                </div>
-                <p className="font-semibold text-yellow-400">
-                  {formatCurrency(dishItem.price)}
-                </p>
-              </div>
-            </div>
+                    {/* Thông tin món ăn */}
+                    <div className="flex flex-col justify-between px-4 py-2 w-full">
+                      <div className='flex flex-col space-y-1'>
+                        <h3 className="text-xl font-semibold text-white line-clamp-1">{dishItem.name}</h3>
+                        <p className="pl-2 text-gray-400 line-clamp-3">{dishItem.description}</p>
+                      </div>
+                      <p className="font-semibold text-yellow-400">
+                        {formatCurrency(dishItem.price)}
+                      </p>
+                    </div>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{dishItem.name}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ))}
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   )
 }

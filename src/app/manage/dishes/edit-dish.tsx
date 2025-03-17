@@ -24,6 +24,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useUploadMediaMutation } from '@/queries/media.querires'
 import { useGetDishQuery, useUpdateDishMutation } from '@/queries/dish.queries'
 import { toast } from 'sonner'
+import revalidateApiRequest from '@/services/revalidate'
 
 export default function EditDish({
   id,
@@ -95,6 +96,7 @@ export default function EditDish({
       toast.success(result.payload.message)
       if (onSubmitSuccess) onSubmitSuccess()
       handleReset()
+      await revalidateApiRequest('list-dish')
     } catch (error) {
       handleErrorApi({
         error,
