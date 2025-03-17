@@ -1,5 +1,5 @@
-'use client'
 
+'use client'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
   ColumnDef,
@@ -36,14 +36,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { getVietnameseTableStatus } from '@/lib/utils'
+import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { TableListResType } from '@/schemaValidations/table.schema'
 import EditTable from '@/app/manage/tables/edit-table'
 import AddTable from '@/app/manage/tables/add-table'
 import QRCodeTable, { QRCodeTableProps } from '@/components/qrcode-generator'
-import { useGetListTableQuery } from '@/queries/table.queries'
+import { useDeleteTableMutation, useGetListTableQuery } from '@/queries/table.queries'
+import { toast } from 'sonner'
 
 type TableItem = TableListResType['data'][0]
 
@@ -63,7 +64,11 @@ export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'number',
     header: 'Số bàn',
-    cell: ({ row }) => <div className='capitalize pl-4'>{row.getValue('number')}</div>
+    cell: ({ row }) => <div className='capitalize pl-4'>{row.getValue('number')}</div>,
+    filterFn: (rows, id, filterValue) => {
+      if (!filterValue) return true
+      return String(filterValue) === String(rows.getValue('number'))
+    }
   },
   {
     accessorKey: 'capacity',
@@ -131,6 +136,21 @@ function AlertDialogDeleteTable({
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
 }) {
+  const { mutateAsync } = useDeleteTableMutation()
+  const deleteTable = async () => {
+    if (tableDelete) {
+      try {
+        const result = await mutateAsync(tableDelete.number)
+        setTableDelete(null)
+        toast.success(result.payload.message)
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
+  }
+
   return (
     <AlertDialog
       open={Boolean(tableDelete)}
@@ -150,7 +170,7 @@ function AlertDialogDeleteTable({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={deleteTable}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
