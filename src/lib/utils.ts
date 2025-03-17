@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import jwt from "jsonwebtoken"
 import authClientServices from "@/services/authClient.services"
 import { DishStatus, OrderStatus, TableStatus } from "@/constants/type"
+import configEnv from "@/configs/env.configs"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -113,6 +114,10 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
     default:
       return 'Ẩn'
   }
+}
+
+export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
+  return configEnv.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
 }
 
 const isBrowser = typeof window !== "undefined"
