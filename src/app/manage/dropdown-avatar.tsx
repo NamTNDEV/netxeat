@@ -22,14 +22,14 @@ export default function DropdownAvatar() {
   const logoutMutation = useLogoutMutation();
   const { data } = useGetMeQuery();
   const account = data?.payload.data;
-  const { handleAuth } = useAuthContext();
+  const { setRole } = useAuthContext();
 
   const handleLogout = async () => {
     if (logoutMutation.isPending) return;
     try {
       await logoutMutation.mutateAsync();
       toast.success('Đăng xuất thành công');
-      handleAuth(false);
+      setRole();
       route.push('/login');
     } catch (error) {
       handleErrorApi({

@@ -1,11 +1,13 @@
 'use client'
 import RefreshToken from "@/components/common/refresh-token"
-import { getAccessTokenFromLocalStorage, removeAccessTokenFromLocalStorage, removeRefreshTokenFromLocalStorage } from "@/lib/utils"
+import { decodeToken, getAccessTokenFromLocalStorage, removeAccessTokenFromLocalStorage, removeRefreshTokenFromLocalStorage } from "@/lib/utils"
+import { RoleTypeValue } from "@/types/jwt.types"
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
 
 const AuthContext = createContext({
     isAuth: false,
-    handleAuth: (isAuth: boolean) => { }
+    roleState: undefined as RoleTypeValue | undefined,
+    setRole: (role?: RoleTypeValue) => { },
 })
 
 export const useAuthContext = () => {
@@ -13,29 +15,31 @@ export const useAuthContext = () => {
 }
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [isAuth, setIsAuth] = useState(false)
+    const [roleState, setRoleState] = useState<RoleTypeValue | undefined>(undefined)
 
     useEffect(() => {
         const accessToken = getAccessTokenFromLocalStorage()
         if (accessToken) {
-            setIsAuth(true)
+            const { role } = decodeToken(accessToken)
+            setRole(role)
         }
     }, [])
 
-    const handleAuth = useCallback((isAuth: boolean) => {
-        if (isAuth) {
-            setIsAuth(true)
-        } else {
-            setIsAuth(false)
+    const setRole = useCallback((role?: RoleTypeValue) => {
+        if (!role) {
             removeAccessTokenFromLocalStorage()
             removeRefreshTokenFromLocalStorage()
         }
+        setRoleState(role)
     }, [])
+
+    const isAuth = Boolean(roleState)
 
     return (
         <AuthContext.Provider value={{
             isAuth,
-            handleAuth
+            roleState,
+            setRole
         }}>
             <RefreshToken />
             {children}

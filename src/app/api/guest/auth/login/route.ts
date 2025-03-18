@@ -1,8 +1,8 @@
 import { HttpError } from "@/lib/http";
 import { cookies } from "next/headers";
-import jwt from 'jsonwebtoken'
 import { GuestLoginBodyType } from "@/schemaValidations/guest.schema";
 import guestApiServices from "@/api/services/guestApi.services";
+import { decodeToken } from "@/lib/utils";
 
 export async function POST(request: Request) {
     const body = (await request.json()) as GuestLoginBodyType;
@@ -10,8 +10,8 @@ export async function POST(request: Request) {
     try {
         const { payload } = await guestApiServices.login(body);
         const { accessToken, refreshToken } = payload.data;
-        const decodedAccessToken = jwt.decode(accessToken) as any;
-        const decodedRefreshToken = jwt.decode(refreshToken) as any;
+        const decodedAccessToken = decodeToken(accessToken);
+        const decodedRefreshToken = decodeToken(refreshToken);
 
         cookieStore.set('accessToken', accessToken, {
             path: '/',

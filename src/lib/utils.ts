@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken"
 import authClientServices from "@/services/authClient.services"
 import { DishStatus, OrderStatus, TableStatus } from "@/constants/type"
 import configEnv from "@/configs/env.configs"
+import { TokenPayloadType } from "@/types/jwt.types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -33,42 +34,6 @@ export const handleErrorApi = ({
     toast.error(error?.payload?.message || "Internal Server Error", {
       duration: toasterDuration
     })
-  }
-}
-
-export const checkAndRefreshToken = async (handler?: {
-  onError?: () => void
-  onSuccess?: () => void
-}) => {
-  const accessToken = getAccessTokenFromLocalStorage()
-  const refreshToken = getRefreshTokenFromLocalStorage()
-  if (!accessToken || !refreshToken) return
-  const decodedAccessToken = jwt.decode(accessToken) as {
-    exp: number,
-    iat: number
-  }
-  const decodedRefreshToken = jwt.decode(refreshToken) as {
-    exp: number,
-    iat: number
-  }
-  const currentTime = new Date().getTime() / 1000 - 1
-  // const currentTime = Date.now() / 1000
-  if (decodedRefreshToken.exp <= currentTime) {
-    removeAccessTokenFromLocalStorage()
-    removeRefreshTokenFromLocalStorage()
-    return handler?.onError && handler.onError()
-  }
-  if (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
-    try {
-      const res = await authClientServices.refreshToken()
-      setAccessTokenToLocalStorage(res.payload.data.accessToken)
-      setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
-      return handler?.onSuccess && handler.onSuccess()
-    } catch (error) {
-      removeAccessTokenFromLocalStorage()
-      removeRefreshTokenFromLocalStorage()
-      return handler?.onError && handler.onError()
-    }
   }
 }
 
@@ -120,6 +85,7 @@ export const getTableLink = ({ token, tableNumber }: { token: string; tableNumbe
   return configEnv.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
 }
 
+// Local Storage
 const isBrowser = typeof window !== "undefined"
 
 export const getAccessTokenFromLocalStorage = () => isBrowser ? localStorage.getItem("accessToken") : null
@@ -129,3 +95,38 @@ export const setRefreshTokenToLocalStorage = (refreshToken: string) => isBrowser
 export const removeAccessTokenFromLocalStorage = () => isBrowser && localStorage.removeItem("accessToken")
 export const removeRefreshTokenFromLocalStorage = () => isBrowser && localStorage.removeItem("refreshToken")
 export const clearLocalStorage = () => isBrowser && localStorage.clear()
+
+// JWT
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayloadType
+}
+
+export const checkAndRefreshToken = async (handler?: {
+  onError?: () => void
+  onSuccess?: () => void
+}) => {
+  const accessToken = getAccessTokenFromLocalStorage()
+  const refreshToken = getRefreshTokenFromLocalStorage()
+  if (!accessToken || !refreshToken) return
+  const decodedAccessToken = decodeToken(accessToken)
+  const decodedRefreshToken = decodeToken(refreshToken)
+  const currentTime = new Date().getTime() / 1000 - 1
+  // const currentTime = Date.now() / 1000
+  if (decodedRefreshToken.exp <= currentTime) {
+    removeAccessTokenFromLocalStorage()
+    removeRefreshTokenFromLocalStorage()
+    return handler?.onError && handler.onError()
+  }
+  if (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
+    try {
+      const res = await authClientServices.refreshToken()
+      setAccessTokenToLocalStorage(res.payload.data.accessToken)
+      setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
+      return handler?.onSuccess && handler.onSuccess()
+    } catch (error) {
+      removeAccessTokenFromLocalStorage()
+      removeRefreshTokenFromLocalStorage()
+      return handler?.onError && handler.onError()
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { normalizePath } from './utils'
+import { getAccessTokenFromLocalStorage, normalizePath, removeAccessTokenFromLocalStorage, removeRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from './utils'
 import configEnv from '@/configs/env.configs'
 import { LoginResType } from '@/schemaValidations/auth.schema'
 
@@ -77,13 +77,11 @@ const request = async <Response>(
                 'Content-Type': 'application/json'
             }
     if (isClient) {
-        const accessToken = localStorage.getItem('accessToken')
+        const accessToken = getAccessTokenFromLocalStorage()
         if (accessToken) {
             baseHeaders.Authorization = `Bearer ${accessToken}`
         }
     }
-    // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.NEXT_PUBLIC_API_ENDPOINT
-    // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server
 
     const baseUrl =
         options?.baseUrl === undefined
@@ -105,7 +103,6 @@ const request = async <Response>(
         status: res.status,
         payload
     }
-    // Interceptor là nời chúng ta xử lý request và response trước khi trả về cho phía component
     if (!res.ok) {
         if (res.status === ENTITY_ERROR_STATUS) {
             throw new EntityError(
@@ -119,7 +116,7 @@ const request = async <Response>(
                 if (!clientLogoutRequest) {
                     clientLogoutRequest = fetch('/api/auth/logout', {
                         method: 'POST',
-                        body: null, // Logout mình sẽ cho phép luôn luôn thành công
+                        body: null,
                         headers: {
                             ...baseHeaders
                         } as any
@@ -129,13 +126,9 @@ const request = async <Response>(
                     } catch (error) {
                         console.log('Error when logout::: ', error)
                     } finally {
-                        localStorage.removeItem('accessToken')
-                        localStorage.removeItem('refreshToken')
+                        removeAccessTokenFromLocalStorage()
+                        removeRefreshTokenFromLocalStorage()
                         clientLogoutRequest = null
-                        // Redirect về trang login có thể dẫn đến loop vô hạn
-                        // Nếu không không được xử lý đúng cách
-                        // Vì nếu rơi vào trường hợp tại trang Login, chúng ta có gọi các API cần access token
-                        // Mà access token đã bị xóa thì nó lại nhảy vào đây, và cứ thế nó sẽ bị lặp
                         location.href = '/login'
                     }
                 }
@@ -149,16 +142,15 @@ const request = async <Response>(
             throw new HttpError(data)
         }
     }
-    // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
     if (isClient) {
         const normalizeUrl = normalizePath(url)
-        if (normalizeUrl === 'api/auth/login') {
+        if (['api/auth/login', 'api/guest/auth/login'].includes(normalizeUrl)) {
             const { accessToken, refreshToken } = (payload as LoginResType).data
-            localStorage.setItem('accessToken', accessToken)
-            localStorage.setItem('refreshToken', refreshToken)
-        } else if (normalizeUrl === 'api/auth/logout') {
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('refreshToken')
+            setAccessTokenToLocalStorage(accessToken)
+            setRefreshTokenToLocalStorage(refreshToken)
+        } else if (['api/auth/logout', 'api/guest/auth/logout'].includes(normalizeUrl)) {
+            removeAccessTokenFromLocalStorage()
+            removeRefreshTokenFromLocalStorage()
         }
     }
     return data
