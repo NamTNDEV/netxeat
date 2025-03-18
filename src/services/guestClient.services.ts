@@ -12,14 +12,14 @@ const guestClientServices = {
     login: (body: GuestLoginBodyType) => http.post<GuestLoginResType>(`${prefix}/auth/login`, body, {
         baseUrl: ''
     }),
-    logout: () => http.post(`${prefix}/auth//logout`, null, {
+    logout: () => http.post(`${prefix}/auth/logout`, null, {
         baseUrl: ''
     }),
     async refreshToken() {
         if (this.refreshTokenRequest) {
             return this.refreshTokenRequest;
         }
-        this.refreshTokenRequest = http.post<RefreshTokenResType>(`${prefix}/auth//refresh-token`, null, { baseUrl: '' });
+        this.refreshTokenRequest = http.post<RefreshTokenResType>(`${prefix}/auth/refresh-token`, null, { baseUrl: '' });
         const result = await this.refreshTokenRequest;
         this.refreshTokenRequest = null;
         return result;

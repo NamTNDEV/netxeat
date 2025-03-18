@@ -43,7 +43,7 @@ export default function GuestLoginForm() {
     try {
       const result = await loginMutation.mutateAsync(data)
       setRole(result.payload.data.guest.role)
-      router.push("/guest/menu")
+      router.push("/guest/order-menu")
     } catch (error) {
       handleErrorApi({
         error,

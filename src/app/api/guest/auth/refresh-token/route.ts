@@ -1,6 +1,6 @@
-import authApiServices from "@/api/services/authApi.services";
 import { cookies } from "next/headers";
-import jwt from 'jsonwebtoken'
+import { decodeToken } from "@/lib/utils";
+import guestApiServices from "@/api/services/guestApi.services";
 
 export async function POST() {
     const cookieStore = cookies();
@@ -9,10 +9,9 @@ export async function POST() {
         return Response.json({ message: 'Unauthorized' }, { status: 401 });
     }
     try {
-        const { payload } = await authApiServices.refreshToken({ refreshToken });
-        const decodedAccessToken = jwt.decode(payload.data.accessToken) as any;
-        const decodedRefreshToken = jwt.decode(payload.data.refreshToken) as any;
-
+        const { payload } = await guestApiServices.refreshToken({ refreshToken });
+        const decodedAccessToken = decodeToken(payload.data.accessToken);
+        const decodedRefreshToken = decodeToken(payload.data.refreshToken);
         cookieStore.set('accessToken', payload.data.accessToken, {
             path: '/',
             httpOnly: true,
