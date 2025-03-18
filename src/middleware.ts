@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { decodeToken } from './lib/utils'
+import { Role } from './constants/type'
 
-const privateRoutes = ['/manage']
+const manageRoutes = ['/manage']
+const guestRoutes = ['/guest']
+const privateRoutes = [...manageRoutes, ...guestRoutes]
 const publicRoutes = ['/login']
 
 export function middleware(request: NextRequest) {
@@ -13,18 +17,43 @@ export function middleware(request: NextRequest) {
         url.searchParams.set('isClearTokens', 'true')
         return NextResponse.redirect(url)
     }
-    if (publicRoutes.some(route => pathname.startsWith(route) && refreshToken && accessToken)) {
-        return NextResponse.redirect(new URL('/', request.url))
+
+    if (refreshToken) {
+        if (publicRoutes.some(route => pathname.startsWith(route) && accessToken)) {
+            return NextResponse.redirect(new URL('/', request.url))
+        }
+
+        if (privateRoutes.some(route => pathname.startsWith(route)) && !accessToken) {
+            const url = new URL('/refresh-token', request.url)
+            url.searchParams.set('refreshToken', refreshToken)
+            url.searchParams.set('redirect', pathname)
+            return NextResponse.redirect(url)
+        }
+
+        const { role } = decodeToken(refreshToken)
+        const isGuestGoToManagePath =
+            role === Role.Guest &&
+            manageRoutes.some((path) => pathname.startsWith(path))
+        const isNotGuestGoToGuestPath =
+            role !== Role.Guest &&
+            guestRoutes.some((path) => pathname.startsWith(path))
+        if (isGuestGoToManagePath || isNotGuestGoToGuestPath) {
+            return NextResponse.redirect(new URL('/', request.url))
+        }
+
+        return NextResponse.next()
     }
-    if (privateRoutes.some(route => pathname.startsWith(route)) && refreshToken && !accessToken) {
-        const url = new URL('/refresh-token', request.url)
-        url.searchParams.set('refreshToken', refreshToken)
-        url.searchParams.set('redirect', pathname)
-        return NextResponse.redirect(url)
-    }
+
+
     return NextResponse.next()
 }
 
 export const config = {
-    matcher: ['/manage/:path*', '/login']
+    matcher: ['/guest/:path*', '/manage/:path*', '/login'],
+    unstable_allowDynamic: [
+        // allows a single file
+        '/lib/utilities.js',
+        // use a glob to allow anything in the function-bind 3rd party module
+        '**/node_modules/function-bind/**',
+    ],
 }

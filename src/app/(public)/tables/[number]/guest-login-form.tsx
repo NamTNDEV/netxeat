@@ -36,7 +36,7 @@ export default function GuestLoginForm() {
     if (!token || !tableNumber) {
       router.push("/")
     }
-  }, [token, tableNumber])
+  }, [token, tableNumber, router])
 
   const handleSubmit = async (data: GuestLoginBodyType) => {
     if (loginMutation.isPending) return

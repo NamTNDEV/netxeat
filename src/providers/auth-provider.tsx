@@ -17,14 +17,6 @@ export const useAuthContext = () => {
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [roleState, setRoleState] = useState<RoleTypeValue | undefined>(undefined)
 
-    useEffect(() => {
-        const accessToken = getAccessTokenFromLocalStorage()
-        if (accessToken) {
-            const { role } = decodeToken(accessToken)
-            setRole(role)
-        }
-    }, [])
-
     const setRole = useCallback((role?: RoleTypeValue) => {
         if (!role) {
             removeAccessTokenFromLocalStorage()
@@ -32,6 +24,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
         setRoleState(role)
     }, [])
+
+    useEffect(() => {
+        const accessToken = getAccessTokenFromLocalStorage()
+        if (accessToken) {
+            const { role } = decodeToken(accessToken)
+            setRole(role)
+        }
+    }, [setRole])
 
     const isAuth = Boolean(roleState)
 

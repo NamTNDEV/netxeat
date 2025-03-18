@@ -5,9 +5,10 @@ import { EntityError } from "./http"
 import { toast } from "sonner"
 import jwt from "jsonwebtoken"
 import authClientServices from "@/services/authClient.services"
-import { DishStatus, OrderStatus, TableStatus } from "@/constants/type"
+import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type"
 import configEnv from "@/configs/env.configs"
 import { TokenPayloadType } from "@/types/jwt.types"
+import guestClientServices from "@/services/guestClient.services"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -119,7 +120,8 @@ export const checkAndRefreshToken = async (handler?: {
   }
   if (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
     try {
-      const res = await authClientServices.refreshToken()
+      const { role } = decodedAccessToken
+      const res = role === Role.Guest ? (await guestClientServices.refreshToken()) : (await authClientServices.refreshToken())
       setAccessTokenToLocalStorage(res.payload.data.accessToken)
       setRefreshTokenToLocalStorage(res.payload.data.refreshToken)
       return handler?.onSuccess && handler.onSuccess()
