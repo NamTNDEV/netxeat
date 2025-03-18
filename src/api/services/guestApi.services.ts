@@ -1,6 +1,6 @@
 import http from "@/lib/http";
 import { LogoutBodyType, RefreshTokenBodyType, RefreshTokenResType } from "@/schemaValidations/auth.schema";
-import { GuestLoginBodyType, GuestLoginResType } from "@/schemaValidations/guest.schema";
+import { GuestCreateOrdersBodyType, GuestCreateOrdersResType, GuestGetOrdersResType, GuestLoginBodyType, GuestLoginResType } from "@/schemaValidations/guest.schema";
 
 const prefix = "/guest";
 
@@ -16,6 +16,9 @@ const guestApiServices = {
         });
     },
     refreshToken: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>(`${prefix}/auth/refresh-token`, body),
+    getOrderList: () => http.get<GuestGetOrdersResType>(`${prefix}/orders`),
+    proceedOrder: (body: GuestCreateOrdersBodyType) =>
+        http.post<GuestCreateOrdersResType>(`${prefix}/orders`, body)
 };
 
 export default guestApiServices;
