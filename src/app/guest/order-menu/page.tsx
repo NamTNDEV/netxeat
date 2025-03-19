@@ -1,16 +1,22 @@
 'use client'
 import Image from 'next/image'
 import { useGetDishesQuery } from '@/queries/dish.queries'
-import { formatCurrency } from '@/lib/utils'
+import { cn, formatCurrency, handleErrorApi } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import clsx from 'clsx'
 import OrderQuantity from './order-quantity'
 import { useMemo, useState } from 'react'
 import { GuestCreateOrdersBodyType } from '@/schemaValidations/guest.schema'
+import { DishStatus } from '@/constants/type'
+import { useRouter } from 'next/navigation'
+import { useGuestOrderMutation } from '@/queries/guest.queries'
+import { toast } from 'sonner'
 
 export default function OrderMenu() {
+    const router = useRouter()
     const { data } = useGetDishesQuery()
+    const guestOrderMutation = useGuestOrderMutation()
+
     const dishes = useMemo(() => {
         return data?.payload.data ?? []
     }, [data])
@@ -29,6 +35,19 @@ export default function OrderMenu() {
         })
     }
 
+    const handleOrder = async () => {
+        if (guestOrderMutation.isPending) return
+        try {
+            const result = await guestOrderMutation.mutateAsync(order)
+            toast.success(result.payload.message)
+            router.push(`/guest/order-history`)
+        } catch (error) {
+            handleErrorApi({
+                error
+            })
+        }
+    }
+
     const totalPrices = useMemo(() => {
         return order.reduce((acc, order) => {
             const dish = dishes.find(dish => dish.id === order.dishId)
@@ -39,13 +58,19 @@ export default function OrderMenu() {
 
     return (
         <>
-            {dishes.map((dish, index) => (
+            {dishes.filter(dish => dish.status !== DishStatus.Hidden).map((dish, index) => (
                 <div key={dish.id}>
                     {index > 0 && <Separator orientation="horizontal" />}
-                    <div className={clsx('flex gap-4', {
-                        'pt-4': index > 0
+                    <div className={cn('flex gap-4', {
+                        'pt-4': index > 0,
+                        'pointer-events-none opacity-60': dish.status === DishStatus.Unavailable
                     })}>
-                        <div className='flex-shrink-0'>
+                        <div className='flex-shrink-0 relative'>
+                            {dish.status === DishStatus.Unavailable && (
+                                <span className='absolute inset-x-0 top-[30px] flex items-center justify-center text-sm'>
+                                    Hết hàng
+                                </span>
+                            )}
                             <Image
                                 src={dish.image}
                                 alt={dish.name}
@@ -62,7 +87,7 @@ export default function OrderMenu() {
                             </div>
                             <div>
                                 <p className='text-sm font-bold'>
-                                    {(dish.price)}
+                                    {formatCurrency(dish.price)}
                                 </p>
                             </div>
                         </div>
@@ -76,8 +101,12 @@ export default function OrderMenu() {
                 </div>
             ))}
             <div className='sticky bottom-0'>
-                <Button className='w-full justify-between'>
-                    <span>Giỏ hàng · {order.length} món</span>
+                <Button
+                    className='w-full justify-between'
+                    disabled={order.length === 0}
+                    onClick={handleOrder}
+                >
+                    <span>Đặt hàng · {order.length} món</span>
                     <span>{formatCurrency(totalPrices)}</span>
                 </Button>
             </div>

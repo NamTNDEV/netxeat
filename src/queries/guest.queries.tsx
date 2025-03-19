@@ -1,11 +1,11 @@
 import guestApiServices from "@/api/services/guestApi.services"
 import guestClientServices from "@/services/guestClient.services"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query"
 
 export const useGuestGetOrderListQuery = () => {
     return useQuery({
+        queryKey: ['guest-order-list'],
         queryFn: guestApiServices.getOrderList,
-        queryKey: ['guest-order-list']
     })
 }
 

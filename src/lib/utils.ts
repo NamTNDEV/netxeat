@@ -86,6 +86,21 @@ export const getTableLink = ({ token, tableNumber }: { token: string; tableNumbe
   return configEnv.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
 }
 
+export const getStatusIcon = (status: string) => {
+  switch (status) {
+    case "COMPLETED":
+      return "check-circle"
+    case "PENDING":
+      return "clock"
+    case "PROCESSING":
+      return "refresh-cw"
+    case "CANCELLED":
+      return "x-circle"
+    default:
+      return "help-circle"
+  }
+}
+
 // Local Storage
 const isBrowser = typeof window !== "undefined"
 

@@ -20,6 +20,7 @@ const OrderQuantity = ({
                     if (value === 0) return
                     onChange(value - 1)
                 }}
+                disabled={value === 0}
             >
                 <Minus className='w-3 h-3' />
             </Button>
