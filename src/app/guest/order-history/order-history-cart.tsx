@@ -7,9 +7,11 @@ import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils"
 import { useGuestGetOrderListQuery } from "@/queries/guest.queries"
 import { Clock, Package } from "lucide-react"
 import Image from "next/image"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
 import { OrderStatus } from "@/constants/type"
+import socket from "@/lib/socket"
+import { UpdateOrderResType } from "@/schemaValidations/order.schema"
 
 // Hàm helper để xác định màu sắc của badge dựa trên trạng thái
 const getStatusColor = (status: string) => {
@@ -81,7 +83,7 @@ const OrderItem = ({ order, index }: { order: any; index: number }) => {
 
 // Component chính
 const OrderHistoryCart = () => {
-    const { data, isLoading } = useGuestGetOrderListQuery()
+    const { data, isLoading, refetch } = useGuestGetOrderListQuery()
     const orders = useMemo(() => data?.payload.data ?? [], [data])
 
     const totalPrice = useMemo(() => {
@@ -89,6 +91,35 @@ const OrderHistoryCart = () => {
             return result + order.dishSnapshot.price * order.quantity
         }, 0)
     }, [orders])
+
+    useEffect(() => {
+        if (socket.connected) {
+            onConnect()
+        }
+
+        function onConnect() {
+            console.log("Socker IO connected to server successfully: ", socket.id)
+        }
+
+        function onDisconnect() {
+            console.log('Socket IO disconnected from server')
+        }
+
+        function onUpdateOrder(data: UpdateOrderResType['data']) {
+            refetch()
+        }
+
+        socket.on('update-order', onUpdateOrder)
+
+        socket.on('connect', onConnect)
+        socket.on('disconnect', onDisconnect)
+
+        return () => {
+            socket.off('connect', onConnect)
+            socket.off('disconnect', onDisconnect)
+            socket.off('update-order', onUpdateOrder)
+        }
+    }, [refetch])
 
     if (isLoading) {
         return (
