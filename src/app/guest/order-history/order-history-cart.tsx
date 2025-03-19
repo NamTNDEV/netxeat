@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import { OrderStatus } from "@/constants/type"
 import socket from "@/lib/socket"
 import { UpdateOrderResType } from "@/schemaValidations/order.schema"
+import { toast } from "sonner"
 
 // Hàm helper để xác định màu sắc của badge dựa trên trạng thái
 const getStatusColor = (status: string) => {
@@ -106,6 +107,13 @@ const OrderHistoryCart = () => {
         }
 
         function onUpdateOrder(data: UpdateOrderResType['data']) {
+            const {
+                dishSnapshot: { name },
+                quantity
+            } = data
+            toast.success(
+                `Món ${name} (SL: ${quantity}) vừa được cập nhật sang trạng thái "${getVietnameseOrderStatus(data.status)}"`
+            )
             refetch()
         }
 
