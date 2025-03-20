@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
 import { OrderStatus } from "@/constants/type"
 import socket from "@/lib/socket"
-import { UpdateOrderResType } from "@/schemaValidations/order.schema"
+import { PayGuestOrdersResType, UpdateOrderResType } from "@/schemaValidations/order.schema"
 import { toast } from "sonner"
 
 // Hàm helper để xác định màu sắc của badge dựa trên trạng thái
@@ -87,10 +87,47 @@ const OrderHistoryCart = () => {
     const { data, isLoading, refetch } = useGuestGetOrderListQuery()
     const orders = useMemo(() => data?.payload.data ?? [], [data])
 
-    const totalPrice = useMemo(() => {
-        return orders.reduce((result, order) => {
-            return result + order.dishSnapshot.price * order.quantity
-        }, 0)
+    const { waitingForPaying, paid } = useMemo(() => {
+        return orders.reduce(
+            (result, order) => {
+                if (
+                    order.status === OrderStatus.Delivered ||
+                    order.status === OrderStatus.Processing ||
+                    order.status === OrderStatus.Pending
+                ) {
+                    return {
+                        ...result,
+                        waitingForPaying: {
+                            price:
+                                result.waitingForPaying.price +
+                                order.dishSnapshot.price * order.quantity,
+                            quantity: result.waitingForPaying.quantity + order.quantity
+                        }
+                    }
+                }
+                if (order.status === OrderStatus.Paid) {
+                    return {
+                        ...result,
+                        paid: {
+                            price:
+                                result.paid.price + order.dishSnapshot.price * order.quantity,
+                            quantity: result.paid.quantity + order.quantity
+                        }
+                    }
+                }
+                return result
+            },
+            {
+                waitingForPaying: {
+                    price: 0,
+                    quantity: 0
+                },
+                paid: {
+                    price: 0,
+                    quantity: 0
+                }
+            }
+        )
     }, [orders])
 
     useEffect(() => {
@@ -117,8 +154,14 @@ const OrderHistoryCart = () => {
             refetch()
         }
 
-        socket.on('update-order', onUpdateOrder)
+        function onPayment(data: PayGuestOrdersResType['data']) {
+            const { guest } = data[0]
+            toast.success(`${guest?.name} tại bàn ${guest?.tableNumber} thanh toán thành công ${data.length} đơn`)
+            refetch()
+        }
 
+        socket.on('update-order', onUpdateOrder)
+        socket.on('payment', onPayment)
         socket.on('connect', onConnect)
         socket.on('disconnect', onDisconnect)
 
@@ -126,6 +169,7 @@ const OrderHistoryCart = () => {
             socket.off('connect', onConnect)
             socket.off('disconnect', onDisconnect)
             socket.off('update-order', onUpdateOrder)
+            socket.off('payment', onPayment)
         }
     }, [refetch])
 
@@ -158,17 +202,27 @@ const OrderHistoryCart = () => {
             </div>
 
             <Card className="sticky bottom-4 mt-4 p-4 bg-white border border-gray-200 shadow-lg dark:bg-slate-800">
-                <div className="flex justify-between items-center">
-                    <div className="flex flex-col">
-                        <span className="text-sm text-gray-500">Tổng cộng</span>
-                        <span className="text-lg font-bold">{orders.length} món</span>
+                <div className="grid grid-cols-2 gap-6 text-gray-300">
+                    {/* Chưa thanh toán */}
+                    <div className="flex flex-col items-center">
+                        <span className="text-sm text-gray-400">Chưa thanh toán</span>
+                        <span className="text-lg font-bold text-yellow-400">
+                            {waitingForPaying.quantity} món
+                        </span>
+                        <span className="text-xl font-bold text-yellow-500">
+                            {formatCurrency(waitingForPaying.price)}
+                        </span>
                     </div>
 
-                    <Separator orientation="vertical" className="h-10 mx-4" />
-
-                    <div className="flex flex-col items-end">
-                        <span className="text-sm text-gray-500">Thành tiền</span>
-                        <span className="text-xl font-bold text-primary">{formatCurrency(totalPrice)}</span>
+                    {/* Đã thanh toán */}
+                    <div className="flex flex-col items-center">
+                        <span className="text-sm text-gray-400">Đã thanh toán</span>
+                        <span className="text-lg font-bold text-green-400">
+                            {paid.quantity} món
+                        </span>
+                        <span className="text-xl font-bold text-green-500">
+                            {formatCurrency(paid.price)}
+                        </span>
                     </div>
                 </div>
             </Card>
