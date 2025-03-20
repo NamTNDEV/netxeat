@@ -1,6 +1,12 @@
 import orderApiServices from '@/api/services/orderApi.services'
-import { GetOrdersQueryParamsType, PayGuestOrdersBodyType, UpdateOrderBodyType } from '@/schemaValidations/order.schema'
+import { CreateOrdersBodyType, GetOrdersQueryParamsType, PayGuestOrdersBodyType, UpdateOrderBodyType } from '@/schemaValidations/order.schema'
 import { useMutation, useQuery } from '@tanstack/react-query'
+
+export const useCreateOrderMutation = () => {
+    return useMutation({
+        mutationFn: orderApiServices.createOrder
+    })
+}
 
 export const useUpdateOrderMutation = () => {
     return useMutation({
