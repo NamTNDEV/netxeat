@@ -3,8 +3,8 @@ import { Home, LineChart, ShoppingCart, Users2, Salad, Table } from 'lucide-reac
 const menuItems = [
   {
     title: 'Dashboard',
-    Icon: Home,
-    href: '/'
+    Icon: LineChart,
+    href: '/manage/dashboard'
   },
   {
     title: 'Đơn hàng',
@@ -20,12 +20,6 @@ const menuItems = [
     title: 'Món ăn',
     Icon: Salad,
     href: '/manage/dishes'
-  },
-
-  {
-    title: 'Phân tích',
-    Icon: LineChart,
-    href: '/manage/analytics'
   },
   {
     title: 'Nhân viên',
