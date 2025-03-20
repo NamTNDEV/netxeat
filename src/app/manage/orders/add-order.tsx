@@ -15,17 +15,27 @@ import { Switch } from '@/components/ui/switch'
 import GuestsDialog from '@/app/manage/orders/guests-dialog'
 import { CreateOrdersBodyType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
-import { cn, formatCurrency } from '@/lib/utils'
+import { cn, formatCurrency, handleErrorApi } from '@/lib/utils'
 import { DishStatus } from '@/constants/type'
-import { DishListResType } from '@/schemaValidations/dish.schema'
 import OrderQuantity from '@/app/guest/order-menu/order-quantity'
+import { useGetDishesQuery } from '@/queries/dish.queries'
+import { useCreateOrderMutation } from '@/queries/order.queries'
+import { useCreateNewGuestMutation } from '@/queries/account.queries'
+import { toast } from 'sonner'
 
 export default function AddOrder() {
+  const createOrderMutation = useCreateOrderMutation()
+  const createGuestMutation = useCreateNewGuestMutation()
+
   const [open, setOpen] = useState(false)
   const [selectedGuest, setSelectedGuest] = useState<GetListGuestsResType['data'][0] | null>(null)
   const [isNewGuest, setIsNewGuest] = useState(true)
   const [orders, setOrders] = useState<CreateOrdersBodyType['orders']>([])
-  const dishes: DishListResType['data'] = []
+  const { data } = useGetDishesQuery()
+  const dishes = useMemo(() => {
+    if (!data) return []
+    return data.payload.data
+  }, [data])
 
   const totalPrice = useMemo(() => {
     return dishes.reduce((result, dish) => {
@@ -60,10 +70,50 @@ export default function AddOrder() {
     })
   }
 
-  const handleOrder = async () => { }
+  const handleOrder = async () => {
+    try {
+      let guestId = selectedGuest?.id
+      if (isNewGuest) {
+        const guestRes = await createGuestMutation.mutateAsync({
+          name,
+          tableNumber
+        })
+        guestId = guestRes.payload.data.id
+      }
+      if (!guestId) {
+        toast.warning('Vui lòng chọn khách hàng hoặc tạo khách hàng mới')
+        return
+      }
+      await createOrderMutation.mutateAsync({
+        guestId,
+        orders
+      })
+      reset()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
+  const reset = () => {
+    form.reset()
+    setSelectedGuest(null)
+    setIsNewGuest(true)
+    setOrders([])
+    setOpen(false)
+  }
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog
+      onOpenChange={(value) => {
+        if (!value) {
+          reset()
+        }
+        setOpen(value)
+      }}
+      open={open}>
       <DialogTrigger asChild>
         <Button size='sm' className='h-7 gap-1'>
           <PlusCircle className='h-3.5 w-3.5' />
@@ -165,9 +215,9 @@ export default function AddOrder() {
                 />
               </div>
               <div className='space-y-1'>
-                <h3 className='text-sm'>{dish.name}</h3>
-                <p className='text-xs'>{dish.description}</p>
-                <p className='text-xs font-semibold'>{formatCurrency(dish.price)}</p>
+                <h3 className='text-sm line-clamp-1 font-bold'>{dish.name}</h3>
+                <p className='text-xs line-clamp-2'>{dish.description}</p>
+                <p className='text-sm font-bold'>{formatCurrency(dish.price)}</p>
               </div>
               <div className='flex-shrink-0 ml-auto flex justify-center items-center'>
                 <OrderQuantity
