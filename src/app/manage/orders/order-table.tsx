@@ -12,13 +12,13 @@ import {
 } from '@tanstack/react-table'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { GetOrdersResType } from '@/schemaValidations/order.schema'
+import { GetOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import AddOrder from '@/app/manage/orders/add-order'
 import EditOrder from '@/app/manage/orders/edit-order'
 import { createContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
-import { getVietnameseOrderStatus } from '@/lib/utils'
+import { getVietnameseOrderStatus, handleErrorApi } from '@/lib/utils'
 import { OrderStatusValues } from '@/constants/type'
 import OrderStatics from '@/app/manage/orders/order-statics'
 import orderTableColumns from '@/app/manage/orders/order-table-columns'
@@ -30,9 +30,12 @@ import { Button } from '@/components/ui/button'
 import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { endOfDay, format, startOfDay } from 'date-fns'
-import { useGetOrderListQuery } from '@/queries/order.queries'
+import { useGetOrderListQuery, useUpdateOrderMutation } from '@/queries/order.queries'
 import { useGetListTableQuery } from '@/queries/table.queries'
 import TableSkeleton from './table-skeleton'
+import socket from '@/lib/socket'
+import { toast } from 'sonner'
+import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => { },
@@ -59,7 +62,6 @@ const initFromDate = startOfDay(new Date())
 const initToDate = endOfDay(new Date())
 export default function OrderTable() {
   const searchParam = useSearchParams()
-
   const [toDate, setToDate] = useState(initToDate)
   const [fromDate, setFromDate] = useState(initFromDate)
   const [openStatusFilter, setOpenStatusFilter] = useState(false)
@@ -70,6 +72,7 @@ export default function OrderTable() {
     fromDate,
     toDate
   })
+  const refetchOrderList = getOrderListQuery.refetch
   const orderList = getOrderListQuery.data?.payload.data ?? []
   const getTableListQuery = useGetListTableQuery()
   const tableList = getTableListQuery.data?.payload.data ?? []
@@ -83,16 +86,23 @@ export default function OrderTable() {
     pageSize: PAGE_SIZE //default page size
   })
 
-
-
   const { statics, orderObjectByGuestId, servingGuestByTableNumber } = useOrderService(orderList)
+  const updateOrderMutation = useUpdateOrderMutation()
 
   const changeStatus = async (body: {
     orderId: number
     dishId: number
     status: (typeof OrderStatusValues)[number]
     quantity: number
-  }) => { }
+  }) => {
+    try {
+      await updateOrderMutation.mutateAsync(body)
+    } catch (error) {
+      handleErrorApi({
+        error
+      })
+    }
+  }
 
   const table = useReactTable({
     data: orderList,
@@ -122,6 +132,55 @@ export default function OrderTable() {
       pageSize: PAGE_SIZE
     })
   }, [table, pageIndex])
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect()
+    }
+
+    function onConnect() {
+      console.log("Socker IO connected to server successfully: ", socket.id)
+    }
+
+    function onDisconnect() {
+      console.log('Socket IO disconnected from server')
+    }
+
+    function handleRefetch() {
+      const currentTime = new Date()
+      if (currentTime < fromDate || currentTime > toDate) return
+      refetchOrderList()
+    }
+
+    function onUpdateOrder(data: UpdateOrderResType['data']) {
+      const {
+        dishSnapshot: { name },
+        quantity
+      } = data
+      toast.success(
+        `Món ${name} (SL: ${quantity}) vừa được cập nhật sang trạng thái "${getVietnameseOrderStatus(data.status)}"`
+      )
+      handleRefetch()
+    }
+
+    function onNewOrder(data: GuestCreateOrdersResType['data']) {
+      const { guest } = data[0]
+      toast.success(`${guest?.name} tại bàn ${guest?.tableNumber} vừa đặt ${data.length} đơn`)
+      handleRefetch()
+    }
+
+    socket.on('new-order', onNewOrder)
+    socket.on('update-order', onUpdateOrder)
+    socket.on('connect', onConnect)
+    socket.on('disconnect', onDisconnect)
+
+    return () => {
+      socket.off('connect', onConnect)
+      socket.off('disconnect', onDisconnect)
+      socket.off('update-order', onUpdateOrder)
+      socket.off('new-order', onNewOrder)
+    }
+  }, [refetchOrderList, fromDate, toDate])
 
   const resetDateFilter = () => {
     setFromDate(initFromDate)

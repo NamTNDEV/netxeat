@@ -77,9 +77,10 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
             <Image
               src={row.original.dishSnapshot.image}
               alt={row.original.dishSnapshot.name}
-              width={50}
-              height={50}
-              className='rounded-md object-cover w-[50px] h-[50px] cursor-pointer'
+              width={100}
+              height={100}
+              className='rounded-md object-cover cursor-pointer w-[50px] h-[50px]'
+              priority
             />
           </PopoverTrigger>
           <PopoverContent>

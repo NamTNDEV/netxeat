@@ -7,13 +7,14 @@ import { UpdateOrderBody, UpdateOrderBodyType } from '@/schemaValidations/order.
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { getVietnameseOrderStatus } from '@/lib/utils'
+import { getVietnameseOrderStatus, handleErrorApi } from '@/lib/utils'
 import { OrderStatus, OrderStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DishesDialog } from '@/app/manage/orders/dishes-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DishListResType } from '@/schemaValidations/dish.schema'
+import { useGetOrderQuery, useUpdateOrderMutation } from '@/queries/order.queries'
 
 const fakeOrderDetail = {
   id: 30,
@@ -63,8 +64,9 @@ export default function EditOrder({
   setId: (value: number | undefined) => void
   onSubmitSuccess?: () => void
 }) {
-  const [selectedDish, setSelectedDish] = useState<DishListResType['data'][0]>(fakeOrderDetail.dishSnapshot as any)
-  const orderDetail = fakeOrderDetail
+  const [selectedDish, setSelectedDish] = useState<DishListResType['data'][0] | null>(null)
+  const { data } = useGetOrderQuery(id)
+  const updateOrderMutation = useUpdateOrderMutation()
   const form = useForm<UpdateOrderBodyType>({
     resolver: zodResolver(UpdateOrderBody),
     defaultValues: {
@@ -74,10 +76,40 @@ export default function EditOrder({
     }
   })
 
-  const onSubmit = async (values: UpdateOrderBodyType) => {}
+  useEffect(() => {
+    if (data) {
+      const { status, dishSnapshot: { dishId }, quantity } = data.payload.data
+      form.reset({
+        status,
+        dishId: dishId || 0,
+        quantity
+      })
+      setSelectedDish(data.payload.data.dishSnapshot)
+    }
+  }, [data, form])
 
-  const reset = () => {
+  const onSubmit = async (values: UpdateOrderBodyType) => {
+    if (updateOrderMutation.isPending) return
+    try {
+      await updateOrderMutation.mutateAsync({
+        orderId: id as number,
+        dishId: values.dishId,
+        quantity: values.quantity,
+        status: values.status
+      })
+      onSubmitSuccess?.()
+      handleReset()
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      })
+    }
+  }
+
+  const handleReset = () => {
     setId(undefined)
+    setSelectedDish(null)
   }
 
   return (
@@ -85,7 +117,7 @@ export default function EditOrder({
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          reset()
+          handleReset()
         }
       }}
     >
