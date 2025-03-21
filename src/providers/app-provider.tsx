@@ -5,6 +5,7 @@ import AuthProvider from "./auth-provider"
 import { ThemeProvider } from "./theme-provider"
 import { SocketProvider } from "./socket-provider"
 import RefreshToken from "@/components/common/refresh-token"
+import ListenLogoutSocket from "@/components/common/listen-logout-socket"
 
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -13,6 +14,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
                 <QueryProvider>
                     <SocketProvider>
                         <RefreshToken />
+                        <ListenLogoutSocket />
                         {children}
                     </SocketProvider>
                     <Toaster />

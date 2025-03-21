@@ -13,7 +13,6 @@ const RefreshToken = () => {
     const { disconnect: disconnectSocket, socket } = useSocketContext()
 
     useEffect(() => {
-        console.log("RefreshToken mounted:::")
         if (UNAUTHENTICATED_PATHS.includes(pathname)) return
         let interval: any = null
         const handleRefreshToken = (isForceRefresh?: boolean) => checkAndRefreshToken({
