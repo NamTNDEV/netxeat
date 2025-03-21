@@ -126,6 +126,19 @@ export const formatDateTimeToTimeString = (date: string | Date) => {
   return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss')
 }
 
+export const executeApiRequest = async <T>(fn: () => Promise<T>) => {
+  let result = null
+  try {
+    result = await fn()
+  } catch (error: any) {
+    console.error("API Request Error:", error);
+    if (error.digest?.includes('NEXT_REDIRECT')) {
+      throw error
+    }
+  }
+  return result
+}
+
 export const OrderStatusIcon = {
   [OrderStatus.Pending]: Loader,
   [OrderStatus.Processing]: CookingPot,

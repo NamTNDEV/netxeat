@@ -1,8 +1,8 @@
-import { dishApiServices } from '@/api/services/dishApi.services'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { formatCurrency } from '@/lib/utils'
-import { DishListResType } from '@/schemaValidations/dish.schema'
-import Image from 'next/image'
+import { dishApiServices } from "@/api/services/dishApi.services"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { formatCurrency } from "@/lib/utils"
+import { DishListResType } from "@/schemaValidations/dish.schema"
+import Image from "next/image"
 
 export default async function Home() {
   let dishList: DishListResType['data'] = []
@@ -42,32 +42,36 @@ export default async function Home() {
             <TooltipProvider key={dishItem.id}>
               <Tooltip>
                 <TooltipTrigger>
-                  <div
-                    className="flex flex-col sm:flex-row bg-gray-900 rounded-lg p-4 hover:opacity-80 transition-opacity cursor-pointer"
-                  >
-                    {/* Ảnh món ăn */}
-                    <div className="w-full sm:w-48 h-48 overflow-hidden rounded-md flex-shrink-0">
-                      <Image
-                        width={200}
-                        height={200}
-                        quality={100}
-                        alt={dishItem.name}
-                        src={dishItem.image}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    {/* Thông tin món ăn */}
-                    <div className="flex flex-col justify-between px-4 py-2 w-full">
-                      <div className='flex flex-col space-y-1'>
-                        <h3 className="text-xl font-semibold text-white line-clamp-1">{dishItem.name}</h3>
-                        <p className="pl-2 text-gray-400 line-clamp-3">{dishItem.description}</p>
+                  <>
+                    <div className="flex flex-col sm:flex-row bg-gray-900 rounded-lg p-4 hover:opacity-80 transition-opacity cursor-pointer relative">
+                      {/* Hình tròn nhỏ góc trên bên trái */}
+                      <div className="absolute top-2 left-2 w-12 h-12 rounded-full bg-gray-700 text-white dark:text-white flex items-center justify-center text-sm font-semibold">
+                        ID: {dishItem.id}
                       </div>
-                      <p className="font-semibold text-yellow-400">
-                        {formatCurrency(dishItem.price)}
-                      </p>
+                      {/* Ảnh món ăn */}
+                      <div className="w-full sm:w-48 h-48 overflow-hidden rounded-md flex-shrink-0">
+                        <Image
+                          width={200}
+                          height={200}
+                          quality={100}
+                          alt={dishItem.name}
+                          src={dishItem.image}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Thông tin món ăn */}
+                      <div className="flex flex-col justify-between px-4 py-2 w-full">
+                        <div className='flex flex-col space-y-1'>
+                          <h3 className="text-xl font-semibold text-white line-clamp-1">{dishItem.name}</h3>
+                          <p className="pl-2 text-gray-400 line-clamp-3">{dishItem.description}</p>
+                        </div>
+                        <p className="font-semibold text-yellow-400">
+                          {formatCurrency(dishItem.price)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{dishItem.name}</p>
@@ -76,7 +80,7 @@ export default async function Home() {
             </TooltipProvider>
           ))}
         </div>
-      </section >
-    </div >
+      </section>
+    </div>
   )
 }
