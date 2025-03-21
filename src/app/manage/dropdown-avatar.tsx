@@ -15,16 +15,16 @@ import { useLogoutMutation } from '@/queries/auth.queries'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useGetMeQuery } from '@/queries/account.queries'
-import { useAuthContext } from '@/providers/auth-provider'
-import { useSocketContext } from '@/providers/socket-provider'
+import { useAuthStore } from '@/stores/auth.stores'
+import { useSocketStore } from '@/stores/socket.stores'
 
 export default function DropdownAvatar() {
   const route = useRouter();
   const logoutMutation = useLogoutMutation();
   const { data } = useGetMeQuery();
   const account = data?.payload.data;
-  const { setRole } = useAuthContext();
-  const { disconnect: disconnectSocket } = useSocketContext()
+  const { setRole } = useAuthStore();
+  const { disconnect: disconnectSocket } = useSocketStore()
 
 
   const handleLogout = async () => {

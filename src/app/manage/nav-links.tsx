@@ -2,14 +2,14 @@
 import menuItems from '@/app/manage/menuItems'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
-import { useAuthContext } from '@/providers/auth-provider'
+import { useAuthStore } from '@/stores/auth.stores'
 import { Package2, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 export default function NavLinks() {
   const pathname = usePathname()
-  const { roleState } = useAuthContext()
+  const { role } = useAuthStore()
 
   return (
     <TooltipProvider>
@@ -24,7 +24,7 @@ export default function NavLinks() {
           </Link>
 
           {menuItems.map((Item, index) => {
-            if (Item.roles && !Item.roles.includes(roleState as any)) return null
+            if (Item.roles && !Item.roles.includes(role as any)) return null
             const isActive = pathname === Item.href
             return (
               <Tooltip key={index}>

@@ -1,6 +1,6 @@
 'use client'
 import { checkAndRefreshToken, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from "@/lib/utils"
-import { useSocketContext } from "@/providers/socket-provider"
+import { useSocketStore } from "@/stores/socket.stores"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 
@@ -10,7 +10,7 @@ const TIMEOUT = (30 * 60 * 1000) / 6
 const RefreshToken = () => {
     const router = useRouter()
     const pathname = usePathname()
-    const { disconnect: disconnectSocket, socket } = useSocketContext()
+    const { disconnect: disconnectSocket, socket } = useSocketStore()
 
     useEffect(() => {
         if (UNAUTHENTICATED_PATHS.includes(pathname)) return

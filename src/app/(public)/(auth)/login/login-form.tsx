@@ -12,17 +12,17 @@ import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
-import { useAuthContext } from '@/providers/auth-provider'
-import { useSocketContext } from '@/providers/socket-provider'
 import { createSocketInstance } from '@/lib/socket'
+import { useAuthStore } from '@/stores/auth.stores'
+import { useSocketStore } from '@/stores/socket.stores'
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const isClearTokens = searchParams.get('isClearTokens')
-  const { setRole } = useAuthContext()
-  const { setSocket } = useSocketContext()
+  const { setRole } = useAuthStore()
+  const { setSocket } = useSocketStore()
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),

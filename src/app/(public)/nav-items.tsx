@@ -3,10 +3,10 @@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Role } from '@/constants/type'
 import { cn, handleErrorApi } from '@/lib/utils'
-import { useAuthContext } from '@/providers/auth-provider'
-import { useSocketContext } from '@/providers/socket-provider'
 import { useLogoutMutation } from '@/queries/auth.queries'
 import { useGuestLogoutMutation } from '@/queries/guest.queries'
+import { useAuthStore } from '@/stores/auth.stores'
+import { useSocketStore } from '@/stores/socket.stores'
 import { RoleTypeValue } from '@/types/jwt.types'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -44,16 +44,16 @@ const menuItems: {
   ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const { roleState, setRole } = useAuthContext()
-  const { disconnect: disconnectSocket } = useSocketContext()
+  const { role, setRole } = useAuthStore()
+  const { disconnect: disconnectSocket } = useSocketStore()
   const managerLogoutMutation = useLogoutMutation()
   const guestLogoutMutation = useGuestLogoutMutation()
   const router = useRouter()
 
   const logout = async () => {
-    if (roleState === Role.Guest && guestLogoutMutation.isPending || managerLogoutMutation.isPending) return
+    if (role === Role.Guest && guestLogoutMutation.isPending || managerLogoutMutation.isPending) return
     try {
-      const { mutateAsync } = roleState === Role.Guest ? guestLogoutMutation : managerLogoutMutation
+      const { mutateAsync } = role === Role.Guest ? guestLogoutMutation : managerLogoutMutation
       await mutateAsync()
       setRole()
       disconnectSocket()
@@ -67,10 +67,10 @@ export default function NavItems({ className }: { className?: string }) {
   return (
     <>
       {menuItems.map((item) => {
-        const isAuth = item.role && roleState && item.role.includes(roleState)
+        const isAuth = item.role && role && item.role.includes(role)
         const canShow =
           (item.role === undefined && !item.hideWhenLogin) ||
-          (!roleState && item.hideWhenLogin)
+          (!role && item.hideWhenLogin)
         if (isAuth || canShow) {
           return (
             <Link href={item.href} key={item.href} className={className}>
@@ -80,7 +80,7 @@ export default function NavItems({ className }: { className?: string }) {
         }
         return null
       })}
-      {roleState && (
+      {role && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <div className={cn(className, 'cursor-pointer')}>Đăng xuất</div>

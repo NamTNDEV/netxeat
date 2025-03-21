@@ -167,7 +167,6 @@ export const checkAndRefreshToken = async (handler?: {
   }
   if (handler?.isForceRefresh || (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3)) {
     try {
-      console.log("Refresh token:::")
       const { role } = decodedAccessToken
       const res = role === Role.Guest ? (await guestClientServices.refreshToken()) : (await authClientServices.refreshToken())
       setAccessTokenToLocalStorage(res.payload.data.accessToken)

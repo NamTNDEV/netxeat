@@ -1,8 +1,8 @@
 'use client'
 import { getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage } from '@/lib/utils'
-import { useAuthContext } from '@/providers/auth-provider'
-import { useSocketContext } from '@/providers/socket-provider'
 import { useLogoutMutation } from '@/queries/auth.queries'
+import { useAuthStore } from '@/stores/auth.stores'
+import { useSocketStore } from '@/stores/socket.stores'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useRef } from 'react'
 
@@ -12,8 +12,8 @@ const LogoutPage = () => {
     const accessTokenFromUrl = useSearchParams().get('accessToken')
     const refreshTokenFromUrl = useSearchParams().get('refreshToken')
     const ref = useRef<any>(null)
-    const { setRole } = useAuthContext()
-    const { disconnect: disconnectSocket } = useSocketContext()
+    const { setRole } = useAuthStore()
+    const { disconnect: disconnectSocket } = useSocketStore()
 
     useEffect(() => {
         if (ref.current || !accessTokenFromUrl || !refreshTokenFromUrl ||

@@ -12,7 +12,7 @@ import { motion } from "framer-motion"
 import { OrderStatus } from "@/constants/type"
 import { PayGuestOrdersResType, UpdateOrderResType } from "@/schemaValidations/order.schema"
 import { toast } from "sonner"
-import { useSocketContext } from "@/providers/socket-provider"
+import { useSocketStore } from "@/stores/socket.stores"
 
 // Hàm helper để xác định màu sắc của badge dựa trên trạng thái
 const getStatusColor = (status: string) => {
@@ -86,7 +86,7 @@ const OrderItem = ({ order, index }: { order: any; index: number }) => {
 const OrderHistoryCart = () => {
     const { data, isLoading, refetch } = useGuestGetOrderListQuery()
     const orders = useMemo(() => data?.payload.data ?? [], [data])
-    const { socket } = useSocketContext()
+    const { socket } = useSocketStore()
 
     const { waitingForPaying, paid } = useMemo(() => {
         return orders.reduce(

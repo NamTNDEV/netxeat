@@ -11,9 +11,9 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useGuestLoginMutation } from '@/queries/guest.queries'
 import { handleErrorApi } from '@/lib/utils'
-import { useAuthContext } from '@/providers/auth-provider'
-import { useSocketContext } from '@/providers/socket-provider'
 import { createSocketInstance } from '@/lib/socket'
+import { useAuthStore } from '@/stores/auth.stores'
+import { useSocketStore } from '@/stores/socket.stores'
 
 export default function GuestLoginForm() {
   const router = useRouter()
@@ -22,8 +22,8 @@ export default function GuestLoginForm() {
   const token = searchParams.get('token')
   const tableNumber = Number(params.number)
 
-  const { setRole } = useAuthContext()
-  const { setSocket } = useSocketContext()
+  const { setRole } = useAuthStore()
+  const { setSocket } = useSocketStore()
 
   const loginMutation = useGuestLoginMutation()
 

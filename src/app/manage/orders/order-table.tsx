@@ -35,7 +35,7 @@ import { useGetListTableQuery } from '@/queries/table.queries'
 import TableSkeleton from './table-skeleton'
 import { toast } from 'sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
-import { useSocketContext } from '@/providers/socket-provider'
+import { useSocketStore } from '@/stores/socket.stores'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => { },
@@ -61,7 +61,7 @@ const PAGE_SIZE = 10
 const initFromDate = startOfDay(new Date())
 const initToDate = endOfDay(new Date())
 export default function OrderTable() {
-  const { socket } = useSocketContext()
+  const { socket } = useSocketStore()
   const searchParam = useSearchParams()
   const [toDate, setToDate] = useState(initToDate)
   const [fromDate, setFromDate] = useState(initFromDate)

@@ -1,8 +1,8 @@
 'use client'
 import { handleErrorApi } from '@/lib/utils'
-import { useAuthContext } from '@/providers/auth-provider'
-import { useSocketContext } from '@/providers/socket-provider'
 import { useLogoutMutation } from '@/queries/auth.queries'
+import { useAuthStore } from '@/stores/auth.stores'
+import { useSocketStore } from '@/stores/socket.stores'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -12,8 +12,8 @@ export default function ListenLogoutSocket() {
     const pathname = usePathname()
     const router = useRouter()
     const { isPending, mutateAsync } = useLogoutMutation()
-    const { socket, disconnect: disconnectSocket } = useSocketContext()
-    const { setRole } = useAuthContext()
+    const { socket, disconnect: disconnectSocket } = useSocketStore()
+    const { setRole } = useAuthStore()
 
     useEffect(() => {
         if (UNAUTHENTICATED_PATH.includes(pathname)) return

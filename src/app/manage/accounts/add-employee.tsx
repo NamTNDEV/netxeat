@@ -50,7 +50,6 @@ export default function AddEmployee() {
   }, [file, avatar])
 
   const handleReset = () => {
-    console.log("Here")
     form.reset()
     setFile(null)
   }
