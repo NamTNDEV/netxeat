@@ -1,4 +1,5 @@
 'use client'
+import socket from "@/lib/socket"
 import { checkAndRefreshToken, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from "@/lib/utils"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -13,20 +14,42 @@ const RefreshToken = () => {
     useEffect(() => {
         if (UNAUTHENTICATED_PATHS.includes(pathname)) return
         let interval: any = null
-        checkAndRefreshToken({
+        const handleRefreshToken = (isForceRefresh?: boolean) => checkAndRefreshToken({
             onError: () => {
                 clearInterval(interval)
                 router.push('/login')
-            }
+            },
+            isForceRefresh
         })
-        interval = setInterval(() =>
-            checkAndRefreshToken({
-                onError: () => {
-                    clearInterval(interval)
-                    router.push('/login')
-                }
-            }), TIMEOUT)
-        return () => clearInterval(interval)
+        handleRefreshToken()
+        interval = setInterval(handleRefreshToken, TIMEOUT)
+
+        if (socket.connected) {
+            onConnect()
+        }
+
+        function onConnect() {
+            console.log(socket.id)
+        }
+
+        function onDisconnect() {
+            console.log('disconnect')
+        }
+
+        function onRefreshTokenSocket() {
+            handleRefreshToken(true)
+        }
+
+        socket.on('connect', onConnect)
+        socket.on('disconnect', onDisconnect)
+        socket.on('refresh-token', onRefreshTokenSocket)
+
+        return () => {
+            clearInterval(interval)
+            socket.off('connect', onConnect)
+            socket.off('disconnect', onDisconnect)
+            socket.off('refresh-token', onRefreshTokenSocket)
+        }
     }, [router, pathname])
 
     return null

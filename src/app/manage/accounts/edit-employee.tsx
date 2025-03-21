@@ -204,7 +204,7 @@ export default function EditEmployee({
                 render={({ field }) => (
                   <FormItem>
                     <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
-                      <Label htmlFor='role'>Trạng thái</Label>
+                      <Label htmlFor='role'>Vai trò</Label>
                       <div className='col-span-3 w-full space-y-2'>
                         <Select
                           onValueChange={field.onChange}

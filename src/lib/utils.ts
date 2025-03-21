@@ -153,6 +153,7 @@ export const decodeToken = (token: string) => {
 export const checkAndRefreshToken = async (handler?: {
   onError?: () => void
   onSuccess?: () => void
+  isForceRefresh?: boolean
 }) => {
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
@@ -166,8 +167,9 @@ export const checkAndRefreshToken = async (handler?: {
     removeRefreshTokenFromLocalStorage()
     return handler?.onError && handler.onError()
   }
-  if (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3) {
+  if (handler?.isForceRefresh || (decodedAccessToken.exp - currentTime < (decodedAccessToken.exp - decodedAccessToken.iat) / 3)) {
     try {
+      console.log("Refresh token:::")
       const { role } = decodedAccessToken
       const res = role === Role.Guest ? (await guestClientServices.refreshToken()) : (await authClientServices.refreshToken())
       setAccessTokenToLocalStorage(res.payload.data.accessToken)
