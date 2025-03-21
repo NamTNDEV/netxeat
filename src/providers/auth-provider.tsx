@@ -1,5 +1,4 @@
 'use client'
-import RefreshToken from "@/components/common/refresh-token"
 import { decodeToken, getAccessTokenFromLocalStorage, removeAccessTokenFromLocalStorage, removeRefreshTokenFromLocalStorage } from "@/lib/utils"
 import { RoleTypeValue } from "@/types/jwt.types"
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
@@ -41,7 +40,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             roleState,
             setRole
         }}>
-            <RefreshToken />
             {children}
         </AuthContext.Provider>
     )

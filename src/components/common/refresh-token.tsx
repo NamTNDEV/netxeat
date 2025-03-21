@@ -1,6 +1,6 @@
 'use client'
-import socket from "@/lib/socket"
 import { checkAndRefreshToken, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from "@/lib/utils"
+import { useSocketContext } from "@/providers/socket-provider"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 
@@ -10,13 +10,16 @@ const TIMEOUT = (30 * 60 * 1000) / 6
 const RefreshToken = () => {
     const router = useRouter()
     const pathname = usePathname()
+    const { disconnect: disconnectSocket, socket } = useSocketContext()
 
     useEffect(() => {
+        console.log("RefreshToken mounted:::")
         if (UNAUTHENTICATED_PATHS.includes(pathname)) return
         let interval: any = null
         const handleRefreshToken = (isForceRefresh?: boolean) => checkAndRefreshToken({
             onError: () => {
                 clearInterval(interval)
+                disconnectSocket()
                 router.push('/login')
             },
             isForceRefresh
@@ -24,33 +27,19 @@ const RefreshToken = () => {
         handleRefreshToken()
         interval = setInterval(handleRefreshToken, TIMEOUT)
 
-        if (socket.connected) {
-            onConnect()
-        }
-
-        function onConnect() {
-            console.log(socket.id)
-        }
-
-        function onDisconnect() {
-            console.log('disconnect')
-        }
+        if (!socket) return
 
         function onRefreshTokenSocket() {
             handleRefreshToken(true)
         }
 
-        socket.on('connect', onConnect)
-        socket.on('disconnect', onDisconnect)
         socket.on('refresh-token', onRefreshTokenSocket)
 
         return () => {
             clearInterval(interval)
-            socket.off('connect', onConnect)
-            socket.off('disconnect', onDisconnect)
             socket.off('refresh-token', onRefreshTokenSocket)
         }
-    }, [router, pathname])
+    }, [router, pathname, socket, disconnectSocket])
 
     return null
 }

@@ -173,7 +173,7 @@ export default function EditOrder({
                           {...field}
                           value={field.value}
                           onChange={(e) => {
-                            let value = e.target.value
+                            const value = e.target.value
                             const numberValue = Number(value)
                             if (isNaN(numberValue)) {
                               return

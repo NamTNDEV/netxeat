@@ -135,15 +135,13 @@ export const OrderStatusIcon = {
 }
 
 // Local Storage
-const isBrowser = typeof window !== "undefined"
-
-export const getAccessTokenFromLocalStorage = () => isBrowser ? localStorage.getItem("accessToken") : null
-export const getRefreshTokenFromLocalStorage = () => isBrowser ? localStorage.getItem("refreshToken") : null
-export const setAccessTokenToLocalStorage = (accessToken: string) => isBrowser && localStorage.setItem("accessToken", accessToken)
-export const setRefreshTokenToLocalStorage = (refreshToken: string) => isBrowser && localStorage.setItem("refreshToken", refreshToken)
-export const removeAccessTokenFromLocalStorage = () => isBrowser && localStorage.removeItem("accessToken")
-export const removeRefreshTokenFromLocalStorage = () => isBrowser && localStorage.removeItem("refreshToken")
-export const clearLocalStorage = () => isBrowser && localStorage.clear()
+export const getAccessTokenFromLocalStorage = () => (typeof window !== "undefined") ? localStorage.getItem("accessToken") : null
+export const getRefreshTokenFromLocalStorage = () => (typeof window !== "undefined") ? localStorage.getItem("refreshToken") : null
+export const setAccessTokenToLocalStorage = (accessToken: string) => (typeof window !== "undefined") && localStorage.setItem("accessToken", accessToken)
+export const setRefreshTokenToLocalStorage = (refreshToken: string) => (typeof window !== "undefined") && localStorage.setItem("refreshToken", refreshToken)
+export const removeAccessTokenFromLocalStorage = () => (typeof window !== "undefined") && localStorage.removeItem("accessToken")
+export const removeRefreshTokenFromLocalStorage = () => (typeof window !== "undefined") && localStorage.removeItem("refreshToken")
+export const clearLocalStorage = () => (typeof window !== "undefined") && localStorage.clear()
 
 // JWT
 export const decodeToken = (token: string) => {

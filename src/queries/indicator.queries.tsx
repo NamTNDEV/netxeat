@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 
 export const useDashboardIndicatorsQuery = (queryParams: DashboardIndicatorQueryParamsType) => {
     return useQuery({
-        queryKey: ["dashboard-indicators"],
+        queryKey: ["dashboard-indicators", queryParams],
         queryFn: () => indicatorsApiServices.getDashboardIndicators(queryParams)
     })
 }

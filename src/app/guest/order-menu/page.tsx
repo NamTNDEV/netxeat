@@ -54,7 +54,7 @@ export default function OrderMenu() {
             if (!dish) return acc
             return acc + dish.price * order.quantity
         }, 0)
-    }, [order])
+    }, [order, dishes])
 
     return (
         <>

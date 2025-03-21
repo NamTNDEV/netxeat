@@ -13,6 +13,8 @@ import { toast } from 'sonner'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useAuthContext } from '@/providers/auth-provider'
+import { useSocketContext } from '@/providers/socket-provider'
+import { createSocketInstance } from '@/lib/socket'
 
 export default function LoginForm() {
   const loginMutation = useLoginMutation()
@@ -20,6 +22,7 @@ export default function LoginForm() {
   const searchParams = useSearchParams()
   const isClearTokens = searchParams.get('isClearTokens')
   const { setRole } = useAuthContext()
+  const { setSocket } = useSocketContext()
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -41,6 +44,7 @@ export default function LoginForm() {
       const result = await loginMutation.mutateAsync(data)
       toast.success(result.payload.message)
       setRole(result.payload.data.account.role)
+      setSocket(createSocketInstance(result.payload.data.accessToken))
       router.push('/')
     } catch (error: any) {
       handleErrorApi({

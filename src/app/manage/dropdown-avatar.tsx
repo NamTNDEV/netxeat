@@ -16,6 +16,7 @@ import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useGetMeQuery } from '@/queries/account.queries'
 import { useAuthContext } from '@/providers/auth-provider'
+import { useSocketContext } from '@/providers/socket-provider'
 
 export default function DropdownAvatar() {
   const route = useRouter();
@@ -23,6 +24,8 @@ export default function DropdownAvatar() {
   const { data } = useGetMeQuery();
   const account = data?.payload.data;
   const { setRole } = useAuthContext();
+  const { disconnect: disconnectSocket } = useSocketContext()
+
 
   const handleLogout = async () => {
     if (logoutMutation.isPending) return;
@@ -30,6 +33,7 @@ export default function DropdownAvatar() {
       await logoutMutation.mutateAsync();
       toast.success('Đăng xuất thành công');
       setRole();
+      disconnectSocket();
       route.push('/login');
     } catch (error) {
       handleErrorApi({

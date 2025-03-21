@@ -4,6 +4,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Role } from '@/constants/type'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { useAuthContext } from '@/providers/auth-provider'
+import { useSocketContext } from '@/providers/socket-provider'
 import { useLogoutMutation } from '@/queries/auth.queries'
 import { useGuestLogoutMutation } from '@/queries/guest.queries'
 import { RoleTypeValue } from '@/types/jwt.types'
@@ -44,6 +45,7 @@ const menuItems: {
 
 export default function NavItems({ className }: { className?: string }) {
   const { roleState, setRole } = useAuthContext()
+  const { disconnect: disconnectSocket } = useSocketContext()
   const managerLogoutMutation = useLogoutMutation()
   const guestLogoutMutation = useGuestLogoutMutation()
   const router = useRouter()
@@ -51,9 +53,10 @@ export default function NavItems({ className }: { className?: string }) {
   const logout = async () => {
     if (roleState === Role.Guest && guestLogoutMutation.isPending || managerLogoutMutation.isPending) return
     try {
-      let { mutateAsync } = roleState === Role.Guest ? guestLogoutMutation : managerLogoutMutation
+      const { mutateAsync } = roleState === Role.Guest ? guestLogoutMutation : managerLogoutMutation
       await mutateAsync()
       setRole()
+      disconnectSocket()
       router.push('/')
     } catch (error: any) {
       handleErrorApi({

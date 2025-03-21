@@ -33,9 +33,9 @@ import { endOfDay, format, startOfDay } from 'date-fns'
 import { useGetOrderListQuery, useUpdateOrderMutation } from '@/queries/order.queries'
 import { useGetListTableQuery } from '@/queries/table.queries'
 import TableSkeleton from './table-skeleton'
-import socket from '@/lib/socket'
 import { toast } from 'sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
+import { useSocketContext } from '@/providers/socket-provider'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => { },
@@ -61,6 +61,7 @@ const PAGE_SIZE = 10
 const initFromDate = startOfDay(new Date())
 const initToDate = endOfDay(new Date())
 export default function OrderTable() {
+  const { socket } = useSocketContext()
   const searchParam = useSearchParams()
   const [toDate, setToDate] = useState(initToDate)
   const [fromDate, setFromDate] = useState(initFromDate)
@@ -134,18 +135,7 @@ export default function OrderTable() {
   }, [table, pageIndex])
 
   useEffect(() => {
-    if (socket.connected) {
-      onConnect()
-    }
-
-    function onConnect() {
-      console.log("Socker IO connected to server successfully: ", socket.id)
-    }
-
-    function onDisconnect() {
-      console.log('Socket IO disconnected from server')
-    }
-
+    if (!socket) return
     function handleRefetch() {
       const currentTime = new Date()
       if (currentTime < fromDate || currentTime > toDate) return
@@ -178,17 +168,13 @@ export default function OrderTable() {
     socket.on('new-order', onNewOrder)
     socket.on('update-order', onUpdateOrder)
     socket.on('payment', onPayment)
-    socket.on('connect', onConnect)
-    socket.on('disconnect', onDisconnect)
 
     return () => {
-      socket.off('connect', onConnect)
-      socket.off('disconnect', onDisconnect)
       socket.off('update-order', onUpdateOrder)
       socket.off('new-order', onNewOrder)
       socket.off('payment', onPayment)
     }
-  }, [refetchOrderList, fromDate, toDate])
+  }, [refetchOrderList, fromDate, toDate, socket])
 
   const resetDateFilter = () => {
     setFromDate(initFromDate)

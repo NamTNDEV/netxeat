@@ -12,6 +12,8 @@ import { useEffect } from 'react'
 import { useGuestLoginMutation } from '@/queries/guest.queries'
 import { handleErrorApi } from '@/lib/utils'
 import { useAuthContext } from '@/providers/auth-provider'
+import { useSocketContext } from '@/providers/socket-provider'
+import { createSocketInstance } from '@/lib/socket'
 
 export default function GuestLoginForm() {
   const router = useRouter()
@@ -21,6 +23,8 @@ export default function GuestLoginForm() {
   const tableNumber = Number(params.number)
 
   const { setRole } = useAuthContext()
+  const { setSocket } = useSocketContext()
+
   const loginMutation = useGuestLoginMutation()
 
   const form = useForm<GuestLoginBodyType>({
@@ -43,6 +47,7 @@ export default function GuestLoginForm() {
     try {
       const result = await loginMutation.mutateAsync(data)
       setRole(result.payload.data.guest.role)
+      setSocket(createSocketInstance(result.payload.data.accessToken))
       router.push("/guest/order-menu")
     } catch (error) {
       handleErrorApi({

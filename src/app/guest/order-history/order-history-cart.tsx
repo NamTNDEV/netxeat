@@ -10,9 +10,9 @@ import Image from "next/image"
 import { useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
 import { OrderStatus } from "@/constants/type"
-import socket from "@/lib/socket"
 import { PayGuestOrdersResType, UpdateOrderResType } from "@/schemaValidations/order.schema"
 import { toast } from "sonner"
+import { useSocketContext } from "@/providers/socket-provider"
 
 // Hàm helper để xác định màu sắc của badge dựa trên trạng thái
 const getStatusColor = (status: string) => {
@@ -86,6 +86,7 @@ const OrderItem = ({ order, index }: { order: any; index: number }) => {
 const OrderHistoryCart = () => {
     const { data, isLoading, refetch } = useGuestGetOrderListQuery()
     const orders = useMemo(() => data?.payload.data ?? [], [data])
+    const { socket } = useSocketContext()
 
     const { waitingForPaying, paid } = useMemo(() => {
         return orders.reduce(
@@ -131,18 +132,7 @@ const OrderHistoryCart = () => {
     }, [orders])
 
     useEffect(() => {
-        if (socket.connected) {
-            onConnect()
-        }
-
-        function onConnect() {
-            console.log("Socker IO connected to server successfully: ", socket.id)
-        }
-
-        function onDisconnect() {
-            console.log('Socket IO disconnected from server')
-        }
-
+        if (!socket) return
         function onUpdateOrder(data: UpdateOrderResType['data']) {
             const {
                 dishSnapshot: { name },
@@ -162,16 +152,12 @@ const OrderHistoryCart = () => {
 
         socket.on('update-order', onUpdateOrder)
         socket.on('payment', onPayment)
-        socket.on('connect', onConnect)
-        socket.on('disconnect', onDisconnect)
 
         return () => {
-            socket.off('connect', onConnect)
-            socket.off('disconnect', onDisconnect)
             socket.off('update-order', onUpdateOrder)
             socket.off('payment', onPayment)
         }
-    }, [refetch])
+    }, [refetch, socket])
 
     if (isLoading) {
         return (

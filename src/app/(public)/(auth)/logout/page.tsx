@@ -1,6 +1,7 @@
 'use client'
 import { getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage } from '@/lib/utils'
 import { useAuthContext } from '@/providers/auth-provider'
+import { useSocketContext } from '@/providers/socket-provider'
 import { useLogoutMutation } from '@/queries/auth.queries'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useRef } from 'react'
@@ -12,6 +13,7 @@ const LogoutPage = () => {
     const refreshTokenFromUrl = useSearchParams().get('refreshToken')
     const ref = useRef<any>(null)
     const { setRole } = useAuthContext()
+    const { disconnect: disconnectSocket } = useSocketContext()
 
     useEffect(() => {
         if (ref.current || !accessTokenFromUrl || !refreshTokenFromUrl ||
@@ -23,9 +25,10 @@ const LogoutPage = () => {
                 ref.current = null
             }, 2000)
             setRole()
+            disconnectSocket()
             router.push('/login')
         })
-    }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setRole])
+    }, [mutateAsync, router, refreshTokenFromUrl, accessTokenFromUrl, setRole, disconnectSocket])
 
     return (
         <div>LogoutPage</div>
