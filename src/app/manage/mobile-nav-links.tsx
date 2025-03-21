@@ -3,12 +3,14 @@ import menuItems from '@/app/manage/menuItems'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
+import { useAuthContext } from '@/providers/auth-provider'
 import { Package2, PanelLeft } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 export default function MobileNavLinks() {
   const pathname = usePathname()
+  const { roleState } = useAuthContext()
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -31,6 +33,7 @@ export default function MobileNavLinks() {
             <span className='sr-only'>Acme Inc</span>
           </Link>
           {menuItems.map((Item, index) => {
+            if (Item.roles && !Item.roles.includes(roleState as any)) return null
             const isActive = pathname === Item.href
             return (
               <Link

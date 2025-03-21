@@ -5,6 +5,7 @@ import { Role } from './constants/type'
 
 const manageRoutes = ['/manage']
 const guestRoutes = ['/guest']
+const onlyOwnerRoutes = ['/manage/accounts']
 const privateRoutes = [...manageRoutes, ...guestRoutes]
 const publicRoutes = ['/login']
 
@@ -37,7 +38,10 @@ export function middleware(request: NextRequest) {
         const isNotGuestGoToGuestPath =
             role !== Role.Guest &&
             guestRoutes.some((path) => pathname.startsWith(path))
-        if (isGuestGoToManagePath || isNotGuestGoToGuestPath) {
+        const isOnlyOwnerRoute =
+            role !== Role.Owner &&
+            onlyOwnerRoutes.some((path) => pathname.startsWith(path))
+        if (isOnlyOwnerRoute || isGuestGoToManagePath || isNotGuestGoToGuestPath) {
             return NextResponse.redirect(new URL('/', request.url))
         }
 
