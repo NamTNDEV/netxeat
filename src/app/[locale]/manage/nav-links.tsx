@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth.stores'
 import { Package2, Settings } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
-import { usePathname } from 'next/navigation'
+import { usePathname } from '@/i18n/navigation'
 import menuItems from './menuItems'
 
 export default function NavLinks() {

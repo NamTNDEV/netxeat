@@ -8,7 +8,7 @@ import OrderQuantity from './order-quantity'
 import { useMemo, useState } from 'react'
 import { GuestCreateOrdersBodyType } from '@/schemaValidations/guest.schema'
 import { DishStatus } from '@/constants/type'
-import { useRouter } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { useGuestOrderMutation } from '@/queries/guest.queries'
 import { toast } from 'sonner'
 

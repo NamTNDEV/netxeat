@@ -1,7 +1,7 @@
 'use client'
 import { checkAndRefreshToken, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from "@/lib/utils"
 import { useSocketStore } from "@/stores/socket.stores"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter } from "@/i18n/navigation"
 import { useEffect } from "react"
 
 const UNAUTHENTICATED_PATHS = ['/login', '/register', '/refresh-token']

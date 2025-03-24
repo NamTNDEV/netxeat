@@ -3,8 +3,7 @@ import { handleErrorApi } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/auth.queries'
 import { useAuthStore } from '@/stores/auth.stores'
 import { useSocketStore } from '@/stores/socket.stores'
-import { usePathname } from 'next/navigation'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from '@/i18n/navigation'
 import { useEffect } from 'react'
 
 const UNAUTHENTICATED_PATH = ['/login', '/logout', '/refresh-token']

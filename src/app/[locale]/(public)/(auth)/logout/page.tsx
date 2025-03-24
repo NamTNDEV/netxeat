@@ -3,7 +3,8 @@ import { getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage } from 
 import { useLogoutMutation } from '@/queries/auth.queries'
 import { useAuthStore } from '@/stores/auth.stores'
 import { useSocketStore } from '@/stores/socket.stores'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { Suspense, useEffect, useRef } from 'react'
 
 const LogoutPage = () => {
