@@ -3,6 +3,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { formatCurrency } from "@/lib/utils"
 import { DishListResType } from "@/schemaValidations/dish.schema"
 import Image from "next/image"
+import Link from "next/link"
 
 export default async function Home() {
   let dishList: DishListResType['data'] = []
@@ -42,7 +43,7 @@ export default async function Home() {
             <TooltipProvider key={dishItem.id}>
               <Tooltip>
                 <TooltipTrigger>
-                  <>
+                  <Link href={`/dishes/${dishItem.id}`}>
                     <div className="flex flex-col sm:flex-row bg-gray-900 rounded-lg p-4 hover:opacity-80 transition-opacity cursor-pointer relative">
                       {/* Hình tròn nhỏ góc trên bên trái */}
                       <div className="absolute top-2 left-2 w-12 h-12 rounded-full bg-gray-700 text-white dark:text-white flex items-center justify-center text-sm font-semibold">
@@ -71,7 +72,7 @@ export default async function Home() {
                         </p>
                       </div>
                     </div>
-                  </>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{dishItem.name}</p>
