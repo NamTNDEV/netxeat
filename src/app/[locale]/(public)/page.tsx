@@ -4,7 +4,7 @@ import { formatCurrency } from "@/lib/utils"
 import { DishListResType } from "@/schemaValidations/dish.schema"
 import { getTranslations } from "next-intl/server"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from '@/i18n/navigation'
 
 export default async function Home() {
   const t = await getTranslations('HomePage')

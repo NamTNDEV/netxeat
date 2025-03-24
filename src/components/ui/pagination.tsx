@@ -4,7 +4,7 @@ import {
   ChevronRightIcon,
   DotsHorizontalIcon
 } from '@radix-ui/react-icons'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import { ButtonProps, buttonVariants } from '@/components/ui/button'
 

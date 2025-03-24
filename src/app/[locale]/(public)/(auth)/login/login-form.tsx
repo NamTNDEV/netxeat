@@ -72,7 +72,7 @@ export default function LoginForm() {
                   <FormItem>
                     <div className='grid gap-2'>
                       <Label htmlFor='email'>Email</Label>
-                      <Input id='email' type='email' placeholder='m@example.com' required {...field} />
+                      <Input id='email' type='email' placeholder='m@example.com' required {...field} autoComplete={'email'} />
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -87,7 +87,7 @@ export default function LoginForm() {
                       <div className='flex items-center'>
                         <Label htmlFor='password'>Password</Label>
                       </div>
-                      <Input id='password' type='password' required {...field} />
+                      <Input id='password' type='password' required {...field} autoComplete={'current-password'} />
                       <FormMessage />
                     </div>
                   </FormItem>

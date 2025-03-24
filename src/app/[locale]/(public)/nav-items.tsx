@@ -2,13 +2,13 @@
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { Role } from '@/constants/type'
+import { Link } from '@/i18n/navigation'
 import { cn, handleErrorApi } from '@/lib/utils'
 import { useLogoutMutation } from '@/queries/auth.queries'
 import { useGuestLogoutMutation } from '@/queries/guest.queries'
 import { useAuthStore } from '@/stores/auth.stores'
 import { useSocketStore } from '@/stores/socket.stores'
 import { RoleTypeValue } from '@/types/jwt.types'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 const menuItems: {

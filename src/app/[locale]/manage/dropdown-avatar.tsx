@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useRouter } from 'next/navigation'
 import { useLogoutMutation } from '@/queries/auth.queries'
 import { handleErrorApi } from '@/lib/utils'
