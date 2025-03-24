@@ -1,0 +1,10 @@
+{
+  "HomePage": {
+    "title": "NetxEat Restaurant"
+  },
+  "SwitchLanguage": {
+    "title": "Switch language",
+    "en": "English",
+    "vi": "Vietnamese"
+  }
+}
