@@ -39,13 +39,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { useDeleteAccountMutation, useGetListAccountQuery } from '@/queries/account.queries'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
 import EditEmployee from './edit-employee'
 import AddEmployee from './add-employee'
+import SearchParamsLoader, { useSearchParamsLoader } from '@/components/common/search-params-loader'
 
 
 type AccountItem = AccountListResType['data'][0]
@@ -181,8 +181,8 @@ function AlertDialogDeleteAccount({
 const PAGE_SIZE = 10
 export default function AccountTable() {
   const getListAccountQuery = useGetListAccountQuery()
-  const searchParam = useSearchParams()
-  const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
+  const { searchParams, setSearchParams } = useSearchParamsLoader()
+  const page = searchParams?.get('page') ? Number(searchParams?.get('page')) : 1
   const pageIndex = page - 1
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
@@ -227,69 +227,72 @@ export default function AccountTable() {
   }, [table, pageIndex])
 
   return (
-    <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
-      <div className='w-full'>
-        <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={() => { }} />
-        <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
-        <div className='flex items-center py-4'>
-          <Input
-            placeholder='Filter emails...'
-            value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
-            className='max-w-sm'
-          />
-          <div className='ml-auto flex items-center gap-2'>
-            <AddEmployee />
-          </div>
-        </div>
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className='flex items-center justify-end space-x-2 py-4'>
-          <div className='text-xs text-muted-foreground py-4 flex-1 '>
-            Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong <strong>{data.length}</strong>{' '}
-            kết quả
-          </div>
-          <div>
-            <AutoPagination
-              page={table.getState().pagination.pageIndex + 1}
-              pageSize={table.getPageCount()}
-              pathname='/manage/accounts'
+    <>
+      <SearchParamsLoader onParamsReceived={setSearchParams} />
+      <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
+        <div className='w-full'>
+          <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={() => { }} />
+          <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
+          <div className='flex items-center py-4'>
+            <Input
+              placeholder='Filter emails...'
+              value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
+              className='max-w-sm'
             />
+            <div className='ml-auto flex items-center gap-2'>
+              <AddEmployee />
+            </div>
+          </div>
+          <div className='rounded-md border'>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className='h-24 text-center'>
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className='flex items-center justify-end space-x-2 py-4'>
+            <div className='text-xs text-muted-foreground py-4 flex-1 '>
+              Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong <strong>{data.length}</strong>{' '}
+              kết quả
+            </div>
+            <div>
+              <AutoPagination
+                page={table.getState().pagination.pageIndex + 1}
+                pageSize={table.getPageCount()}
+                pathname='/manage/accounts'
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </AccountTableContext.Provider>
+      </AccountTableContext.Provider>
+    </>
   )
 }

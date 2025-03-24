@@ -1,13 +1,14 @@
 'use client'
+import SearchParamsLoader, { useSearchParamsLoader } from '@/components/common/search-params-loader'
 import { checkAndRefreshToken, getRefreshTokenFromLocalStorage } from '@/lib/utils'
-import { useRouter, useSearchParams } from 'next/navigation'
-import React, { Suspense, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
 
 const RefreshTokenPage = () => {
     const router = useRouter()
-    const searchParams = useSearchParams()
-    const refreshToken = searchParams.get('refreshToken')
-    const redirectPathname = searchParams.get('redirect')
+    const { searchParams, setSearchParams } = useSearchParamsLoader()
+    const refreshToken = searchParams?.get('refreshToken')
+    const redirectPathname = searchParams?.get('redirect')
     useEffect(() => {
         if (
             refreshToken &&
@@ -25,15 +26,16 @@ const RefreshTokenPage = () => {
     }, [router, refreshToken, redirectPathname])
 
     return (
-        <div>RefreshTokenPage</div>
+        <>
+            <SearchParamsLoader onParamsReceived={setSearchParams} />
+            <div>RefreshTokenPage</div>
+        </>
     )
 }
 
 const RefreshTokenSuspenseWrapper = () => {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <RefreshTokenPage />
-        </Suspense>
+        <RefreshTokenPage />
     )
 }
 

@@ -5,8 +5,6 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-
-import { Suspense } from 'react'
 import OrderTable from './order-table'
 
 export default function AccountsPage() {
@@ -19,9 +17,7 @@ export default function AccountsPage() {
             <CardDescription>Quản lý đơn hàng</CardDescription>
           </CardHeader>
           <CardContent>
-            <Suspense>
-              <OrderTable />
-            </Suspense>
+            <OrderTable />
           </CardContent>
         </Card>
       </div>

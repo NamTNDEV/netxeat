@@ -9,12 +9,15 @@ import { useGuestLogoutMutation } from '@/queries/guest.queries'
 import { useAuthStore } from '@/stores/auth.stores'
 import { useSocketStore } from '@/stores/socket.stores'
 import { RoleTypeValue } from '@/types/jwt.types'
+import { createTranslator, Messages } from 'next-intl'
+import { NamespaceKeys, NestedKeyOf, useTranslations } from 'use-intl'
+
 
 const menuItems: {
   title: string
   href: string
   role?: RoleTypeValue[]
-  hideWhenLogin?: boolean
+  hideWhenLogin?: boolean,
 }[] = [
     {
       title: 'Trang chủ',

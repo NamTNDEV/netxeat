@@ -37,7 +37,6 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
-import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { TableListResType } from '@/schemaValidations/table.schema'
 import EditTable from '@/app/[locale]/manage/tables/edit-table'
@@ -45,6 +44,7 @@ import AddTable from '@/app/[locale]/manage/tables/add-table'
 import QRCodeTable, { QRCodeTableProps } from '@/components/qrcode-generator'
 import { useDeleteTableMutation, useGetListTableQuery } from '@/queries/table.queries'
 import { toast } from 'sonner'
+import SearchParamsLoader, { useSearchParamsLoader } from '@/components/common/search-params-loader'
 
 type TableItem = TableListResType['data'][0]
 
@@ -180,8 +180,8 @@ function AlertDialogDeleteTable({
 const PAGE_SIZE = 10
 export default function TableTable() {
   const getListTableQuery = useGetListTableQuery()
-  const searchParam = useSearchParams()
-  const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
+  const { searchParams, setSearchParams } = useSearchParamsLoader()
+  const page = searchParams?.get('page') ? Number(searchParams?.get('page')) : 1
   const pageIndex = page - 1
   // const params = Object.fromEntries(searchParam.entries())
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>()
@@ -226,69 +226,72 @@ export default function TableTable() {
   }, [table, pageIndex])
 
   return (
-    <TableTableContext.Provider value={{ tableIdEdit, setTableIdEdit, tableDelete, setTableDelete }}>
-      <div className='w-full'>
-        <EditTable id={tableIdEdit} setId={setTableIdEdit} />
-        <AlertDialogDeleteTable tableDelete={tableDelete} setTableDelete={setTableDelete} />
-        <div className='flex items-center py-4'>
-          <Input
-            placeholder='Lọc số bàn'
-            value={(table.getColumn('number')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('number')?.setFilterValue(event.target.value)}
-            className='max-w-sm'
-          />
-          <div className='ml-auto flex items-center gap-2'>
-            <AddTable />
-          </div>
-        </div>
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className='flex items-center justify-end space-x-2 py-4'>
-          <div className='text-xs text-muted-foreground py-4 flex-1 '>
-            Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong <strong>{data.length}</strong>{' '}
-            kết quả
-          </div>
-          <div>
-            <AutoPagination
-              page={table.getState().pagination.pageIndex + 1}
-              pageSize={table.getPageCount()}
-              pathname='/manage/tables'
+    <>
+      <SearchParamsLoader onParamsReceived={setSearchParams} />
+      <TableTableContext.Provider value={{ tableIdEdit, setTableIdEdit, tableDelete, setTableDelete }}>
+        <div className='w-full'>
+          <EditTable id={tableIdEdit} setId={setTableIdEdit} />
+          <AlertDialogDeleteTable tableDelete={tableDelete} setTableDelete={setTableDelete} />
+          <div className='flex items-center py-4'>
+            <Input
+              placeholder='Lọc số bàn'
+              value={(table.getColumn('number')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('number')?.setFilterValue(event.target.value)}
+              className='max-w-sm'
             />
+            <div className='ml-auto flex items-center gap-2'>
+              <AddTable />
+            </div>
+          </div>
+          <div className='rounded-md border'>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className='h-24 text-center'>
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className='flex items-center justify-end space-x-2 py-4'>
+            <div className='text-xs text-muted-foreground py-4 flex-1 '>
+              Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong <strong>{data.length}</strong>{' '}
+              kết quả
+            </div>
+            <div>
+              <AutoPagination
+                page={table.getState().pagination.pageIndex + 1}
+                pageSize={table.getPageCount()}
+                pathname='/manage/tables'
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </TableTableContext.Provider>
+      </TableTableContext.Provider>
+    </>
   )
 }

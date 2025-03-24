@@ -1,6 +1,4 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-
-import { Suspense } from 'react'
 import AccountTable from './account-table'
 
 export default function Dashboard() {
@@ -13,9 +11,7 @@ export default function Dashboard() {
             <CardDescription>Quản lý tài khoản nhân viên</CardDescription>
           </CardHeader>
           <CardContent>
-            <Suspense>
-              <AccountTable />
-            </Suspense>
+            <AccountTable />
           </CardContent>
         </Card>
       </div>

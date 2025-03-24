@@ -103,6 +103,7 @@ const request = async <Response>(
         status: res.status,
         payload
     }
+
     if (!res.ok) {
         if (res.status === ENTITY_ERROR_STATUS) {
             throw new EntityError(

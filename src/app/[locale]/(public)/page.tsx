@@ -2,11 +2,13 @@ import { dishApiServices } from "@/api/services/dishApi.services"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { formatCurrency } from "@/lib/utils"
 import { DishListResType } from "@/schemaValidations/dish.schema"
-import { getTranslations } from "next-intl/server"
+import { getTranslations, setRequestLocale } from "next-intl/server"
 import Image from "next/image"
 import { Link } from '@/i18n/navigation'
+import { Locale } from "@/configs/locale.configs"
 
-export default async function Home() {
+export default async function Home({ params: { locale } }: { params: { locale: Locale } }) {
+  setRequestLocale(locale);
   const t = await getTranslations('HomePage')
   let dishList: DishListResType['data'] = []
 
@@ -33,12 +35,12 @@ export default async function Home() {
         />
         <div className='z-20 relative py-10 md:py-20 px-4 sm:px-10 md:px-20'>
           <h1 className='text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold'>{t('title')}</h1>
-          <p className='text-center text-sm sm:text-base mt-4'>Vị ngon, trọn khoảnh khắc</p>
+          <p className='text-center text-sm sm:text-base mt-4'>{t('subtitle')}</p>
         </div>
       </div>
       <section className="space-y-10 py-16">
         <h2 className="text-center text-2xl font-bold text-white">
-          Đa dạng các món ăn
+          {t('header')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {dishList.map((dishItem) => (

@@ -38,7 +38,6 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { formatCurrency, getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
-import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import { useDeleteDishMutation, useGetDishesQuery } from '@/queries/dish.queries'
@@ -46,6 +45,7 @@ import { toast } from 'sonner';
 import revalidateApiRequest from '@/services/revalidate';
 import EditDish from './edit-dish';
 import AddDish from './add-dish';
+import SearchParamsLoader, { useSearchParamsLoader } from '@/components/common/search-params-loader';
 
 type DishItem = DishListResType['data'][0]
 
@@ -182,9 +182,9 @@ function AlertDialogDeleteDish({
 // Số lượng item trên 1 trang
 const PAGE_SIZE = 10
 export default function DishTable() {
-  const searchParam = useSearchParams()
+  const { searchParams, setSearchParams } = useSearchParamsLoader()
   const getDishesQuery = useGetDishesQuery()
-  const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
+  const page = searchParams?.get('page') ? Number(searchParams?.get('page')) : 1
   const pageIndex = page - 1
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>()
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null)
@@ -228,69 +228,72 @@ export default function DishTable() {
   }, [table, pageIndex])
 
   return (
-    <DishTableContext.Provider value={{ dishIdEdit, setDishIdEdit, dishDelete, setDishDelete }}>
-      <div className='w-full'>
-        <EditDish id={dishIdEdit} setId={setDishIdEdit} />
-        <AlertDialogDeleteDish dishDelete={dishDelete} setDishDelete={setDishDelete} />
-        <div className='flex items-center py-4'>
-          <Input
-            placeholder='Lọc tên'
-            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
-            className='max-w-sm'
-          />
-          <div className='ml-auto flex items-center gap-2'>
-            <AddDish />
-          </div>
-        </div>
-        <div className='rounded-md border'>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className='flex items-center justify-end space-x-2 py-4'>
-          <div className='text-xs text-muted-foreground py-4 flex-1 '>
-            Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong <strong>{data.length}</strong>{' '}
-            kết quả
-          </div>
-          <div>
-            <AutoPagination
-              page={table.getState().pagination.pageIndex + 1}
-              pageSize={table.getPageCount()}
-              pathname='/manage/dishes'
+    <>
+      <SearchParamsLoader onParamsReceived={setSearchParams} />
+      <DishTableContext.Provider value={{ dishIdEdit, setDishIdEdit, dishDelete, setDishDelete }}>
+        <div className='w-full'>
+          <EditDish id={dishIdEdit} setId={setDishIdEdit} />
+          <AlertDialogDeleteDish dishDelete={dishDelete} setDishDelete={setDishDelete} />
+          <div className='flex items-center py-4'>
+            <Input
+              placeholder='Lọc tên'
+              value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
+              className='max-w-sm'
             />
+            <div className='ml-auto flex items-center gap-2'>
+              <AddDish />
+            </div>
+          </div>
+          <div className='rounded-md border'>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className='h-24 text-center'>
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className='flex items-center justify-end space-x-2 py-4'>
+            <div className='text-xs text-muted-foreground py-4 flex-1 '>
+              Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong <strong>{data.length}</strong>{' '}
+              kết quả
+            </div>
+            <div>
+              <AutoPagination
+                page={table.getState().pagination.pageIndex + 1}
+                pageSize={table.getPageCount()}
+                pathname='/manage/dishes'
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </DishTableContext.Provider>
+      </DishTableContext.Provider>
+    </>
   )
 }

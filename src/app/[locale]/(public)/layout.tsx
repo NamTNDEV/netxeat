@@ -5,14 +5,21 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import DarkModeToggle from '@/components/dark-mode-toggle'
 import NavItems from '@/app/[locale]/(public)/nav-items'
 import { SwitchLanguage } from '@/components/switch-language'
+import { Locale } from '@/configs/locale.configs'
+import { setRequestLocale } from 'next-intl/server'
 
 export default function Layout({
   children,
-  modal
+  modal,
+  params: { locale }
 }: Readonly<{
   children: React.ReactNode,
-  modal: React.ReactNode
+  modal: React.ReactNode,
+  params: {
+    locale: Locale
+  }
 }>) {
+  setRequestLocale(locale);
   return (
     <div className='flex min-h-screen w-full flex-col relative'>
       <header className='sticky z-50 top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6'>

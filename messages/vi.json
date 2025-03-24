@@ -1,9 +1,24 @@
 {
   "HomePage": {
-    "title": "Nhà hàng NetxEat"
+    "title": "Nhà hàng NetxEat",
+    "subtitle": "Vị ngon, trọn khoảnh khắc của bạn",
+    "header": "Đa dạng các món ăn"
+  },
+  "Navbar": {
+    "Home": "Trang chủ",
+    "Menu": "Thực đơn",
+    "Login": "Đăng nhập",
+    "Manager": "Quản lý"
+  },
+  "Login": {
+    "title": "Đăng nhập",
+    "subtitle": "Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "login_btn": "Đăng nhập"
   },
   "SwitchLanguage": {
-    "title": "Chuyển ngôn ngữ",
+    "title": "Chuyển đổi ngôn ngữ",
     "en": "Tiếng Anh",
     "vi": "Tiếng Việt"
   }

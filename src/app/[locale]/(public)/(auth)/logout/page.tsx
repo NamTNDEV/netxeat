@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth.stores'
 import { useSocketStore } from '@/stores/socket.stores'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from '@/i18n/navigation'
-import { Suspense, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 const LogoutPage = () => {
     const { mutateAsync } = useLogoutMutation()
@@ -38,9 +38,7 @@ const LogoutPage = () => {
 
 const LogoutSuspenseWrapper = () => {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <LogoutPage />
-        </Suspense>
+        <LogoutPage />
     )
 }
 

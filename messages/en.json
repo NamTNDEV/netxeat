@@ -1,9 +1,24 @@
 {
   "HomePage": {
-    "title": "NetxEat Restaurant"
+    "title": "NetxEat Restaurant",
+    "subtitle": "Delicious moments await you",
+    "header": "Variety of Dishes"
+  },
+  "Navbar": {
+    "Home": "Home",
+    "Menu": "Menu",
+    "Login": "Login",
+    "Manager": "Manager"
+  },
+  "Login": {
+    "title": "Login",
+    "subtitle": "Enter your email and password to log in to the system",
+    "email": "Email",
+    "password": "Password",
+    "login_btn": "Login"
   },
   "SwitchLanguage": {
-    "title": "Switch language",
+    "title": "Switch Language",
     "en": "English",
     "vi": "Vietnamese"
   }

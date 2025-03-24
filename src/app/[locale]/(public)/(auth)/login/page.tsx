@@ -1,12 +1,16 @@
-import { Suspense } from 'react'
+import { setRequestLocale } from 'next-intl/server'
 import LoginForm from './login-form'
+import { Locale } from '@/configs/locale.configs'
 
-export default function Login() {
+export default function Login({
+  params: { locale }
+}: {
+  params: { locale: Locale }
+}) {
+  setRequestLocale(locale)
   return (
     <div className='min-h-screen flex items-center justify-center'>
-      <Suspense fallback={<div>Loading...</div>}>
-        <LoginForm />
-      </Suspense>
+      <LoginForm />
     </div>
   )
 }

@@ -3,9 +3,10 @@ import { Inter as FontSans } from 'next/font/google'
 import './globals.css'
 import { cn } from '@/lib/utils'
 import AppProvider from '@/providers/app-provider'
-import { hasLocale, NextIntlClientProvider } from 'next-intl'
-import { notFound } from 'next/navigation'
+import { NextIntlClientProvider } from 'next-intl'
 import { routing } from '@/i18n/routing'
+import { setRequestLocale } from 'next-intl/server'
+import { Locale } from '@/configs/locale.configs'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -16,17 +17,23 @@ export const metadata: Metadata = {
   description: 'The best restaurant in the world'
 }
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function RootLayout({
-  params,
+  params: {
+    locale
+  },
   children
 }: Readonly<{
-  params: Promise<{ locale: string }>
+  params: { locale: Locale }
   children: React.ReactNode
 }>) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
+  setRequestLocale(locale);
+  // if (!hasLocale(routing.locales, locale)) {
+  //   notFound();
+  // }
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)} data-gr-c-s-loaded='true'>

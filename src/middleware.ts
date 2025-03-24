@@ -1,15 +1,15 @@
-import type { NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { decodeToken } from './lib/utils'
 import { Role } from './constants/type'
 import { defaultLocale } from './configs/locale.configs'
 import createMiddleware from 'next-intl/middleware'
 import { routing } from './i18n/routing'
 
-const manageRoutes = [`${defaultLocale}/manage`]
-const guestRoutes = [`${defaultLocale}/guest`]
-const onlyOwnerRoutes = [`${defaultLocale}/manage/accounts`]
+const manageRoutes = ['/vi/manage', '/en/manage']
+const guestRoutes = ['/vi/guest', '/en/guest']
+const onlyOwnerRoutes = ['/vi/manage/accounts', '/en/manage/accounts']
 const privateRoutes = [...manageRoutes, ...guestRoutes]
-const publicRoutes = [`${defaultLocale}/login`]
+const publicRoutes = ['/vi/login', '/en/login']
 
 export function middleware(request: NextRequest) {
     const handleI18nRouting = createMiddleware(routing)
@@ -17,27 +17,28 @@ export function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl
     const accessToken = request.cookies.get('accessToken')?.value
     const refreshToken = request.cookies.get('refreshToken')?.value
+    const locale = request.cookies.get('NEXT_LOCALE')?.value ?? defaultLocale
     if (privateRoutes.some(route => pathname.startsWith(route) && !refreshToken)) {
-        const url = new URL('/login', request.url)
+        const url = new URL(`/${locale}/login`, request.url)
         url.searchParams.set('isClearTokens', 'true')
-        // return NextResponse.redirect(url)
-        response.headers.set('x-middleware-rewrite', url.toString())
-        return response
+        return NextResponse.redirect(url)
+        // response.headers.set('x-middleware-rewrite', url.toString())
+        // return response
     }
 
     if (refreshToken) {
         if (publicRoutes.some(route => pathname.startsWith(route) && accessToken)) {
-            // return NextResponse.redirect(new URL('/', request.url))
-            response.headers.set('x-middleware-rewrite', new URL('/', request.url).toString())
-            return response
+            return NextResponse.redirect(new URL(`/${locale}`, request.url))
+            // response.headers.set('x-middleware-rewrite', new URL('/', request.url).toString())
+            // return response
         }
 
         if (privateRoutes.some(route => pathname.startsWith(route)) && !accessToken) {
-            const url = new URL('/refresh-token', request.url)
+            const url = new URL(`/${locale}/refresh-token`, request.url)
             url.searchParams.set('refreshToken', refreshToken)
             url.searchParams.set('redirect', pathname)
-            // return NextResponse.redirect(url)
-            response.headers.set('x-middleware-rewrite', url.toString())
+            return NextResponse.redirect(url)
+            // response.headers.set('x-middleware-rewrite', url.toString())
             return response
         }
 
@@ -52,9 +53,9 @@ export function middleware(request: NextRequest) {
             role !== Role.Owner &&
             onlyOwnerRoutes.some((path) => pathname.startsWith(path))
         if (isOnlyOwnerRoute || isGuestGoToManagePath || isNotGuestGoToGuestPath) {
-            // return NextResponse.redirect(new URL('/', request.url))
-            response.headers.set('x-middleware-rewrite', new URL('/', request.url).toString())
-            return response
+            return NextResponse.redirect(new URL(`/${locale}`, request.url))
+            // response.headers.set('x-middleware-rewrite', new URL('/', request.url).toString())
+            // return response
         }
 
         // return NextResponse.next()

@@ -10,18 +10,20 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '@/queries/auth.queries'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
-import { useSearchParams } from 'next/navigation'
 import { useRouter } from '@/i18n/navigation'
 import { useEffect } from 'react'
 import { createSocketInstance } from '@/lib/socket'
 import { useAuthStore } from '@/stores/auth.stores'
 import { useSocketStore } from '@/stores/socket.stores'
+import SearchParamsLoader, { useSearchParamsLoader } from '@/components/common/search-params-loader'
+import { useTranslations } from 'next-intl'
 
 export default function LoginForm() {
+  const t = useTranslations('Login')
+  const { searchParams, setSearchParams } = useSearchParamsLoader()
   const loginMutation = useLoginMutation()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const isClearTokens = searchParams.get('isClearTokens')
+  const isClearTokens = searchParams?.get('isClearTokens')
   const { setRole } = useAuthStore()
   const { setSocket } = useSocketStore()
 
@@ -57,9 +59,10 @@ export default function LoginForm() {
 
   return (
     <Card className='mx-auto max-w-sm'>
+      <SearchParamsLoader onParamsReceived={setSearchParams} />
       <CardHeader>
-        <CardTitle className='text-2xl'>Đăng nhập</CardTitle>
-        <CardDescription>Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống</CardDescription>
+        <CardTitle className='text-2xl'>{t('title')}</CardTitle>
+        <CardDescription>{t('subtitle')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -72,7 +75,7 @@ export default function LoginForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className='grid gap-2'>
-                      <Label htmlFor='email'>Email</Label>
+                      <Label htmlFor='email'>{t('email')}</Label>
                       <Input id='email' type='email' placeholder='m@example.com' required {...field} autoComplete={'email'} />
                       <FormMessage />
                     </div>
@@ -86,7 +89,7 @@ export default function LoginForm() {
                   <FormItem>
                     <div className='grid gap-2'>
                       <div className='flex items-center'>
-                        <Label htmlFor='password'>Password</Label>
+                        <Label htmlFor='password'>{t('password')}</Label>
                       </div>
                       <Input id='password' type='password' required {...field} autoComplete={'current-password'} />
                       <FormMessage />
@@ -95,11 +98,11 @@ export default function LoginForm() {
                 )}
               />
               <Button type='submit' className='w-full'>
-                Đăng nhập
+                {t('login_btn')}
               </Button>
-              <Button variant='outline' className='w-full' type='button'>
-                Đăng nhập bằng Google
-              </Button>
+              {/* <Button variant='outline' className='w-full' type='button'>
+                  Đăng nhập bằng Google
+                </Button> */}
             </div>
           </form>
         </Form>
