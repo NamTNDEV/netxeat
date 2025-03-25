@@ -1,20 +1,19 @@
 import { dishApiServices } from '@/api/services/dishApi.services'
-import { formatCurrency, executeApiRequest } from '@/lib/utils'
-import Image from 'next/image'
+import { executeApiRequest, getIdFromSlug } from '@/lib/utils'
 import DishDetail from './dish-detail'
 import { Locale } from '@/configs/locale.configs'
 import { setRequestLocale } from 'next-intl/server'
 
 export default async function DishPage({
-    params: { id, locale }
+    params: { slug, locale }
 }: {
     params: {
-        id: string,
+        slug: string,
         locale: Locale
     }
 }) {
     setRequestLocale(locale);
-    const data = await executeApiRequest(() => dishApiServices.getDish(Number(id)))
+    const data = await executeApiRequest(() => dishApiServices.getDish(Number(getIdFromSlug(slug))))
 
     const dish = data?.payload?.data
     if (!dish)

@@ -1,6 +1,6 @@
 import { dishApiServices } from "@/api/services/dishApi.services"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { formatCurrency } from "@/lib/utils"
+import { formatCurrency, generateSlugUrl } from "@/lib/utils"
 import { DishListResType } from "@/schemaValidations/dish.schema"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import Image from "next/image"
@@ -47,7 +47,7 @@ export default async function Home({ params: { locale } }: { params: { locale: L
             <TooltipProvider key={dishItem.id}>
               <Tooltip>
                 <TooltipTrigger>
-                  <Link href={`/dishes/${dishItem.id}`}>
+                  <Link href={`/dishes/${generateSlugUrl(dishItem.name, dishItem.id)}`}>
                     <div className="flex flex-col sm:flex-row bg-gray-900 rounded-lg p-4 hover:opacity-80 transition-opacity cursor-pointer relative">
                       {/* Hình tròn nhỏ góc trên bên trái */}
                       <div className="absolute top-2 left-2 w-12 h-12 rounded-full bg-gray-700 text-white dark:text-white flex items-center justify-center text-sm font-semibold">

@@ -11,6 +11,7 @@ import { TokenPayloadType } from "@/types/jwt.types"
 import guestClientServices from "@/services/guestClient.services"
 import { format } from "date-fns"
 import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
+import slugify from 'slugify'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -147,6 +148,9 @@ export const OrderStatusIcon = {
   [OrderStatus.Paid]: HandCoins
 }
 
+export const generateSlugUrl = (name: string, id: number) => `${slugify(name)}-id.${id}`
+export const getIdFromSlug = (slug: string) => slug.split('-id.')[1]
+
 // Local Storage
 export const getAccessTokenFromLocalStorage = () => (typeof window !== "undefined") ? localStorage.getItem("accessToken") : null
 export const getRefreshTokenFromLocalStorage = () => (typeof window !== "undefined") ? localStorage.getItem("refreshToken") : null
@@ -192,3 +196,4 @@ export const checkAndRefreshToken = async (handler?: {
     }
   }
 }
+
