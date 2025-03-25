@@ -20,6 +20,7 @@ import { useTranslations } from 'next-intl'
 
 export default function LoginForm() {
   const t = useTranslations('Login')
+  const errorMessageT = useTranslations('ErrorMessage')
   const { searchParams, setSearchParams } = useSearchParamsLoader()
   const loginMutation = useLoginMutation()
   const router = useRouter()
@@ -62,7 +63,7 @@ export default function LoginForm() {
       <SearchParamsLoader onParamsReceived={setSearchParams} />
       <CardHeader>
         <CardTitle className='text-2xl'>{t('title')}</CardTitle>
-        <CardDescription>{t('subtitle')}</CardDescription>
+        <CardDescription>{t('cardDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -72,12 +73,15 @@ export default function LoginForm() {
               <FormField
                 control={form.control}
                 name='email'
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className='grid gap-2'>
-                      <Label htmlFor='email'>{t('email')}</Label>
+                      <Label htmlFor='email'>Email</Label>
                       <Input id='email' type='email' placeholder='m@example.com' required {...field} autoComplete={'email'} />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.email?.message) &&
+                          errorMessageT(errors.email?.message as any)}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}
@@ -85,20 +89,23 @@ export default function LoginForm() {
               <FormField
                 control={form.control}
                 name='password'
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className='grid gap-2'>
                       <div className='flex items-center'>
                         <Label htmlFor='password'>{t('password')}</Label>
                       </div>
                       <Input id='password' type='password' required {...field} autoComplete={'current-password'} />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.password?.message) &&
+                          errorMessageT(errors.password?.message as any)}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}
               />
               <Button type='submit' className='w-full'>
-                {t('login_btn')}
+                {t('buttonLogin')}
               </Button>
               {/* <Button variant='outline' className='w-full' type='button'>
                   Đăng nhập bằng Google

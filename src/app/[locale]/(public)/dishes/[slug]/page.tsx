@@ -1,8 +1,64 @@
 import { dishApiServices } from '@/api/services/dishApi.services'
-import { executeApiRequest, getIdFromSlug } from '@/lib/utils'
+import { executeApiRequest, generateSlugUrl, getIdFromSlug } from '@/lib/utils'
 import DishDetail from './dish-detail'
 import { Locale } from '@/configs/locale.configs'
-import { setRequestLocale } from 'next-intl/server'
+import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { cache } from 'react'
+import { Metadata } from 'next'
+import configEnv from '@/configs/env.configs'
+import { baseOpenGraph } from '@/shared-metadata'
+
+const getDetail = cache((slug: string) =>
+    executeApiRequest(() => dishApiServices.getDish(Number(getIdFromSlug(slug))))
+)
+
+type Props = {
+    params: { slug: string; locale: Locale }
+    searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata({
+    params,
+    searchParams
+}: Props): Promise<Metadata> {
+    const { slug, locale } = params
+
+    const t = await getTranslations({
+        locale,
+        namespace: 'DishDetail'
+    })
+    const data = await getDetail(slug)
+    const dish = data?.payload.data
+    if (!dish) {
+        return {
+            title: t('notFound'),
+            description: t('notFound')
+        }
+    }
+    const url =
+        configEnv.NEXT_PUBLIC_URL +
+        `/${locale}/dishes/${generateSlugUrl(dish.name, dish.id)}`
+
+    return {
+        title: dish.name,
+        description: dish.description,
+        openGraph: {
+            ...baseOpenGraph,
+            title: dish.name,
+            description: dish.description,
+            url,
+            images: [
+                {
+                    url: dish.image,
+                    alt: dish.name
+                }
+            ]
+        },
+        alternates: {
+            canonical: url
+        }
+    }
+}
 
 export default async function DishPage({
     params: { slug, locale }
@@ -13,8 +69,8 @@ export default async function DishPage({
     }
 }) {
     setRequestLocale(locale);
-    const data = await executeApiRequest(() => dishApiServices.getDish(Number(getIdFromSlug(slug))))
-
+    // const data = await executeApiRequest(() => dishApiServices.getDish(Number(getIdFromSlug(slug))))
+    const data = await getDetail(slug)
     const dish = data?.payload?.data
     if (!dish)
         return (

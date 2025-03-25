@@ -1,25 +1,78 @@
 {
-  "HomePage": {
-    "title": "NetxEat Restaurant",
-    "subtitle": "Delicious moments await you",
-    "header": "Variety of Dishes"
+  "ErrorMessage": {
+    "invalidEmail": "Invalid email",
+    "required": "This field cannot be empty",
+    "minmaxPassword": "Password must be between 6 and 100 characters"
   },
-  "Navbar": {
-    "Home": "Home",
-    "Menu": "Menu",
-    "Login": "Login",
-    "Manager": "Manager"
+  "Brand": {
+    "title": "NetxEat Restaurant",
+    "defaultTitle": "NetxEat"
+  },
+  "HomePage": {
+    "title": "Home",
+    "description": "Craving a classic American culinary experience? Big Boy is the perfect choice! Enjoy the iconic Big Boy burger, delicious and savory, along with creamy milkshakes and crispy fries. Perfect for family and friend gatherings!",
+    "slogan": "Delicious moments await",
+    "h2": "Variety of Dishes"
+  },
+  "DishDetail": {
+    "notFound": "Dish not found"
+  },
+  "LoginGuest": {
+    "title": "Login to order",
+    "description": "Enter your login details to place an order"
   },
   "Login": {
     "title": "Login",
-    "subtitle": "Enter your email and password to log in to the system",
-    "email": "Email",
     "password": "Password",
-    "login_btn": "Login"
+    "description": "Admin login area",
+    "cardDescription": "Enter your email and password to log into the system",
+    "buttonLogin": "Login",
+    "loginWithGoogle": "Login with Google"
+  },
+  "GuestMenu": {
+    "title": "Menu",
+    "description": "Choose your favorite dishes"
+  },
+  "ManageAccounts": {
+    "title": "Manage Accounts",
+    "description": "Manage staff accounts"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "description": "View and analyze sales data"
+  },
+  "Dishes": {
+    "title": "Dishes",
+    "description": "Manage dishes"
+  },
+  "Orders": {
+    "title": "Orders",
+    "description": "Manage orders"
+  },
+  "Setting": {
+    "title": "Settings",
+    "description": "Manage your account settings"
+  },
+  "Tables": {
+    "title": "Tables",
+    "description": "Manage dining tables"
   },
   "SwitchLanguage": {
     "title": "Switch Language",
     "en": "English",
     "vi": "Vietnamese"
+  },
+  "NavItem": {
+    "home": "Home",
+    "menu": "Menu",
+    "orders": "Orders",
+    "login": "Login",
+    "logout": "Logout",
+    "manage": "Manage",
+    "logoutDialog": {
+      "logoutQuestion": "Are you sure you want to log out?",
+      "logoutCancel": "Cancel",
+      "logoutConfirm": "Logging out may result in losing your order data"
+    }
   }
 }

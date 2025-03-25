@@ -1,5 +1,37 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import DashboardMain from './dashboard-main'
+import { Locale } from '@/configs/locale.configs'
+import { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
+import configEnv from '@/configs/env.configs'
+
+type Props = {
+  params: { locale: Locale }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const t = await getTranslations({
+    locale: params.locale,
+    namespace: 'Dashboard'
+  })
+
+  const url = configEnv.NEXT_PUBLIC_URL + `/${params.locale}/manage/dashboard`
+
+  return {
+    title: t('title'),
+    description: t('description'),
+    alternates: {
+      canonical: url
+    },
+    robots: {
+      index: false
+    }
+  }
+}
+
 export default async function Dashboard() {
   return (
     <main className='grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8'>

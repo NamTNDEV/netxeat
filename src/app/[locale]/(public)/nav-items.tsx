@@ -20,32 +20,33 @@ const menuItems: {
   hideWhenLogin?: boolean,
 }[] = [
     {
-      title: 'Trang chủ',
+      title: 'home',
       href: '/'
     },
     {
-      title: 'Menu',
+      title: 'menu',
       href: '/guest/order-menu',
       role: [Role.Guest]
     },
     {
-      title: 'Đơn hàng',
+      title: 'orders',
       href: '/guest/order-history',
       role: [Role.Guest]
     },
     {
-      title: 'Đăng nhập',
+      title: 'login',
       href: '/login',
       hideWhenLogin: true
     },
     {
-      title: 'Quản lý',
+      title: 'manage',
       href: '/manage/dashboard',
       role: [Role.Owner, Role.Employee]
     }
   ]
 
 export default function NavItems({ className }: { className?: string }) {
+  const t = useTranslations('NavItem')
   const { role, setRole } = useAuthStore()
   const { disconnect: disconnectSocket } = useSocketStore()
   const managerLogoutMutation = useLogoutMutation()
@@ -76,7 +77,7 @@ export default function NavItems({ className }: { className?: string }) {
         if (isAuth || canShow) {
           return (
             <Link href={item.href} key={item.href} className={className}>
-              {item.title}
+              {t(item.title as any)}
             </Link>
           )
         }
@@ -85,17 +86,17 @@ export default function NavItems({ className }: { className?: string }) {
       {role && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <div className={cn(className, 'cursor-pointer')}>Đăng xuất</div>
+            <div className={cn(className, 'cursor-pointer')}>{t('logout')}</div>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Bạn có muốn đăng xuất không?</AlertDialogTitle>
+              <AlertDialogTitle>{t('logoutDialog.logoutQuestion')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Việc đăng xuất có thể làm mất đi hóa đơn của bạn
+                {t('logoutDialog.logoutConfirm')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Thoát</AlertDialogCancel>
+              <AlertDialogCancel>{t('logoutDialog.logoutCancel')}</AlertDialogCancel>
               <AlertDialogAction onClick={logout}>OK</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

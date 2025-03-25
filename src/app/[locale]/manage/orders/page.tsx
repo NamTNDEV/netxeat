@@ -6,6 +6,37 @@ import {
   CardTitle
 } from '@/components/ui/card'
 import OrderTable from './order-table'
+import { Locale } from '@/configs/locale.configs'
+import { Metadata } from 'next'
+import { getTranslations } from 'next-intl/server'
+import configEnv from '@/configs/env.configs'
+
+type Props = {
+  params: { locale: Locale }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+export async function generateMetadata({
+  params,
+}: Props): Promise<Metadata> {
+  const t = await getTranslations({
+    locale: params.locale,
+    namespace: 'Orders'
+  })
+
+  const url = configEnv.NEXT_PUBLIC_URL + `/${params.locale}/manage/orders`
+
+  return {
+    title: t('title'),
+    description: t('description'),
+    alternates: {
+      canonical: url
+    },
+    robots: {
+      index: false
+    }
+  }
+}
 
 export default function AccountsPage() {
   return (

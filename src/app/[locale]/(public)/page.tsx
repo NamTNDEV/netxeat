@@ -6,8 +6,45 @@ import { getTranslations, setRequestLocale } from "next-intl/server"
 import Image from "next/image"
 import { Link } from '@/i18n/navigation'
 import { Locale } from "@/configs/locale.configs"
+import configEnv from "@/configs/env.configs"
+import { baseOpenGraph } from "@/shared-metadata"
 
-export default async function Home({ params: { locale } }: { params: { locale: Locale } }) {
+export async function generateMetadata(props: { params: Promise<{ locale: Locale }> }) {
+  const params = await props.params
+  const { locale } = params
+
+  const t = await getTranslations({ locale, namespace: 'HomePage' })
+  const url = configEnv.NEXT_PUBLIC_URL + `/${locale}`
+
+  return {
+    title: t('title'),
+    description: t('description'),
+    openGraph: {
+      ...baseOpenGraph,
+      title: t('title'),
+      description: t('description'),
+      url,
+      images: [
+        {
+          url: configEnv.NEXT_PUBLIC_URL + '/banner.jpg',
+          width: 1200,
+          height: 620,
+          alt: 'Banner',
+        }
+      ]
+    },
+    alternates: {
+      canonical: url
+    },
+  }
+}
+
+export default async function Home(props: {
+  params: Promise<{ locale: Locale }>
+}) {
+  const params = await props.params
+
+  const { locale } = params
   setRequestLocale(locale);
   const t = await getTranslations('HomePage')
   let dishList: DishListResType['data'] = []
@@ -25,9 +62,9 @@ export default async function Home({ params: { locale } }: { params: { locale: L
       <div className='relative'>
         <span className='absolute top-0 left-0 w-full h-full bg-black opacity-50 z-10'></span>
         <Image
-          src='/banner.png'
-          width={400}
-          height={200}
+          src='/banner.jpg'
+          width={1200}
+          height={620}
           quality={100}
           alt='Banner'
           priority
@@ -35,12 +72,12 @@ export default async function Home({ params: { locale } }: { params: { locale: L
         />
         <div className='z-20 relative py-10 md:py-20 px-4 sm:px-10 md:px-20'>
           <h1 className='text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold'>{t('title')}</h1>
-          <p className='text-center text-sm sm:text-base mt-4'>{t('subtitle')}</p>
+          <p className='text-center text-sm sm:text-base mt-4'>{t('h2')}</p>
         </div>
       </div>
       <section className="space-y-10 py-16">
         <h2 className="text-center text-2xl font-bold text-white">
-          {t('header')}
+          {t('slogan')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {dishList.map((dishItem) => (
