@@ -80,8 +80,7 @@ export default function LoginForm() {
                       <Label htmlFor='email'>Email</Label>
                       <Input id='email' type='email' placeholder='m@example.com' required {...field} autoComplete={'email'} />
                       <FormMessage>
-                        {Boolean(errors.email?.message) &&
-                          errorMessageT(errors.email?.message as any)}
+                        {Boolean(errors.email?.message) && errors.email?.message as any}
                       </FormMessage>
                     </div>
                   </FormItem>
@@ -98,8 +97,7 @@ export default function LoginForm() {
                       </div>
                       <Input id='password' type='password' required {...field} autoComplete={'current-password'} />
                       <FormMessage>
-                        {Boolean(errors.password?.message) &&
-                          errorMessageT(errors.password?.message as any)}
+                        {Boolean(errors.password?.message) && errors.password?.message as any}
                       </FormMessage>
                     </div>
                   </FormItem>
