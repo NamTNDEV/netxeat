@@ -1,5 +1,5 @@
 import { dishApiServices } from '@/api/services/dishApi.services'
-import { executeApiRequest, generateSlugUrl, getIdFromSlug } from '@/lib/utils'
+import { executeApiRequest, generateSlugUrl, getIdFromSlug, htmlToTextForDescription } from '@/lib/utils'
 import DishDetail from './dish-detail'
 import { Locale } from '@/configs/locale.configs'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
@@ -41,7 +41,7 @@ export async function generateMetadata({
 
     return {
         title: dish.name,
-        description: dish.description,
+        description: htmlToTextForDescription(dish.description),
         openGraph: {
             ...baseOpenGraph,
             title: dish.name,

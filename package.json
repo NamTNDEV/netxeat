@@ -32,6 +32,7 @@
     "date-fns": "^4.1.0",
     "dompurify": "^3.2.4",
     "framer-motion": "^12.5.0",
+    "html-to-text": "^9.0.5",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.479.0",
     "next": "14.2.24",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.67.2",
+    "@types/html-to-text": "^9.0.4",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^18",

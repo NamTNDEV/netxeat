@@ -1,6 +1,6 @@
 import { dishApiServices } from "@/api/services/dishApi.services"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { formatCurrency, generateSlugUrl } from "@/lib/utils"
+import { formatCurrency, generateSlugUrl, htmlToTextForDescription } from "@/lib/utils"
 import { DishListResType } from "@/schemaValidations/dish.schema"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import Image from "next/image"
@@ -18,7 +18,7 @@ export async function generateMetadata(props: { params: Promise<{ locale: Locale
 
   return {
     title: t('title'),
-    description: t('description'),
+    description: htmlToTextForDescription(t('description')),
     openGraph: {
       ...baseOpenGraph,
       title: t('title'),
