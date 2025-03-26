@@ -121,7 +121,7 @@ export default function EditOrder({
         }
       }}
     >
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Cập nhật đơn hàng</DialogTitle>
         </DialogHeader>

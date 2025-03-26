@@ -65,6 +65,7 @@ export const columns: ColumnDef<DishItem>[] = [
           alt={row.original.name}
           width={50}
           height={50}
+          loading='lazy'
           className='rounded-md object-cover w-[50px] h-[50px]'
         />
         <span>{row.original.name}</span>
@@ -140,7 +141,7 @@ export function DishesDialog({ onChoose }: { onChoose: (dish: DishItem) => void 
       <DialogTrigger asChild>
         <Button variant='outline'>Thay đổi</Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px]'>
+      <DialogContent className='sm:max-w-[600px]' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Chọn món ăn</DialogTitle>
         </DialogHeader>

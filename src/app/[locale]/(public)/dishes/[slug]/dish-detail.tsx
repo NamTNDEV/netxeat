@@ -26,7 +26,6 @@ const DishDetail = ({ dish }: { dish: DishResType['data'] | undefined }) => {
                     alt={dish.name}
                     title={dish.name}
                     className="object-cover rounded-lg shadow-xl w-full max-w-[360px] h-[360px]"
-                    priority
                 />
             </div>
 

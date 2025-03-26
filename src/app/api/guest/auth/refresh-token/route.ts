@@ -3,7 +3,7 @@ import { decodeToken } from "@/lib/utils";
 import guestApiServices from "@/api/services/guestApi.services";
 
 export async function POST() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const refreshToken = cookieStore.get('refreshToken')?.value;
     if (!refreshToken) {
         return Response.json({ message: 'Unauthorized' }, { status: 401 });

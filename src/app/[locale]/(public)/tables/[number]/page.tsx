@@ -5,12 +5,11 @@ import { getTranslations } from "next-intl/server";
 import configEnv from "@/configs/env.configs";
 
 type Props = {
-  params: { number: string; locale: Locale }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<{ number: string; locale: Locale }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const t = await getTranslations({
     locale: params.locale,
     namespace: 'LoginGuest'

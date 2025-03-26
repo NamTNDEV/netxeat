@@ -59,7 +59,7 @@ export default function OrderStatics({
           }
         }}
       >
-        <DialogContent className='max-h-full overflow-auto'>
+        <DialogContent className='max-h-full overflow-auto' aria-describedby={undefined}>
           {selectedServingGuest && (
             <DialogHeader>
               <DialogTitle>Khách đang ngồi tại bàn {selectedTableNumber}</DialogTitle>

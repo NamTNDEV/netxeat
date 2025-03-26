@@ -120,7 +120,7 @@ export default function AddOrder() {
           <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>Tạo đơn hàng</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Tạo đơn hàng</DialogTitle>
         </DialogHeader>

@@ -6,7 +6,7 @@ import { decodeToken } from "@/lib/utils";
 
 export async function POST(request: Request) {
     const body = (await request.json()) as GuestLoginBodyType;
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     try {
         const { payload } = await guestApiServices.login(body);
         const { accessToken, refreshToken } = payload.data;

@@ -97,7 +97,7 @@ export default async function Home(props: {
                           width={200}
                           height={200}
                           quality={80}
-                          loading="lazy"
+                          priority
                           alt={dishItem.name}
                           src={dishItem.image}
                           className="w-full h-full object-cover"

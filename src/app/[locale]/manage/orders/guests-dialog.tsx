@@ -123,7 +123,7 @@ export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem
       <DialogTrigger asChild>
         <Button variant='outline'>Chọn khách</Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[700px] max-h-full overflow-auto'>
+      <DialogContent className='sm:max-w-[700px] max-h-full overflow-auto' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Chọn khách hàng</DialogTitle>
         </DialogHeader>

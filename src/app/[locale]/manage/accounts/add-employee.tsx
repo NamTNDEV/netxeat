@@ -88,7 +88,7 @@ export default function AddEmployee() {
           <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>Tạo tài khoản</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Tạo tài khoản</DialogTitle>
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>

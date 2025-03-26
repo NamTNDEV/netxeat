@@ -6,7 +6,7 @@ import accountApiServices from "@/api/services/accountApi.services";
 
 export async function PUT(request: Request) {
     const body = (await request.json()) as ChangePasswordV2BodyType;
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const access_token = cookieStore.get('accessToken')?.value;
     if (!access_token) {
         return Response.json({ message: 'Unauthorized' }, { status: 401 });

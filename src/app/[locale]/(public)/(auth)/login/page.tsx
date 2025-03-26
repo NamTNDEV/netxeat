@@ -23,11 +23,17 @@ export async function generateMetadata(props: {
   }
 }
 
-export default function Login({
-  params: { locale }
-}: {
-  params: { locale: Locale }
-}) {
+export default async function Login(
+  props: {
+    params: Promise<{ locale: Locale }>
+  }
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   setRequestLocale(locale)
   return (
     <div className='min-h-screen flex items-center justify-center'>

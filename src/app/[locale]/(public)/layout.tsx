@@ -8,17 +8,24 @@ import { SwitchLanguage } from '@/components/switch-language'
 import { Locale } from '@/configs/locale.configs'
 import { setRequestLocale } from 'next-intl/server'
 
-export default function Layout({
-  children,
-  modal,
-  params: { locale }
-}: Readonly<{
-  children: React.ReactNode,
-  modal: React.ReactNode,
-  params: {
-    locale: Locale
-  }
-}>) {
+export default async function Layout(
+  props: Readonly<{
+    children: React.ReactNode,
+    modal: React.ReactNode,
+    params: Promise<{ locale: Locale }>
+  }>
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
+  const {
+    children,
+    modal
+  } = props;
+
   setRequestLocale(locale);
   return (
     <div className='flex min-h-screen w-full flex-col relative'>

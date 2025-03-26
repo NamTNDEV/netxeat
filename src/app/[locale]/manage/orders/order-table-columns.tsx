@@ -80,7 +80,7 @@ const orderTableColumns: ColumnDef<OrderItem>[] = [
               width={100}
               height={100}
               className='rounded-md object-cover cursor-pointer w-[50px] h-[50px]'
-              priority
+              loading='lazy'
             />
           </PopoverTrigger>
           <PopoverContent>

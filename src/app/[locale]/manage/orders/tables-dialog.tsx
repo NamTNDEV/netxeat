@@ -99,7 +99,7 @@ export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => voi
       <DialogTrigger asChild>
         <Button variant='outline'>Thay đổi</Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[600px] max-h-full overflow-auto'>
+      <DialogContent className='sm:max-w-[600px] max-h-full overflow-auto' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Chọn bàn</DialogTitle>
         </DialogHeader>

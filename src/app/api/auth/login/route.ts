@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken'
 
 export async function POST(request: Request) {
     const body = (await request.json()) as LoginBodyType;
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     try {
         const { payload } = await authApiServices.login(body);
         const { accessToken, refreshToken } = payload.data;

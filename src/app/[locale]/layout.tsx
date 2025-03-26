@@ -14,11 +14,17 @@ const fontSans = FontSans({
   variable: '--font-sans'
 })
 
-export async function generateMetadata({
-  params: { locale }
-}: {
-  params: { locale: Locale }
-}) {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ locale: Locale }>
+  }
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   const t = await getTranslations({ locale, namespace: 'Brand' })
 
   return {
@@ -33,15 +39,22 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export default async function RootLayout({
-  params: {
+export default async function RootLayout(
+  props: Readonly<{
+    params: Promise<{ locale: Locale }>
+    children: React.ReactNode
+  }>
+) {
+  const params = await props.params;
+
+  const {
     locale
-  },
-  children
-}: Readonly<{
-  params: { locale: Locale }
-  children: React.ReactNode
-}>) {
+  } = params;
+
+  const {
+    children
+  } = props;
+
   setRequestLocale(locale);
   return (
     <html lang={locale} suppressHydrationWarning>

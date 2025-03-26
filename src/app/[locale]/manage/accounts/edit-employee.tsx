@@ -122,7 +122,7 @@ export default function EditEmployee({
         }
       }}
     >
-      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+      <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto' aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Cập nhật tài khoản</DialogTitle>
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
