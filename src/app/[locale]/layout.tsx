@@ -7,6 +7,7 @@ import { routing } from '@/i18n/routing'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Locale } from '@/configs/locale.configs'
 import NextTopLoader from 'nextjs-toploader';
+import Footer from '@/components/layouts/footer'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -52,6 +53,7 @@ export default async function RootLayout({
         <NextIntlClientProvider>
           <AppProvider>
             {children}
+            <Footer />
           </AppProvider>
         </NextIntlClientProvider>
       </body>

@@ -74,5 +74,11 @@
       "logoutCancel": "Hủy",
       "logoutConfirm": "Đăng xuất có thể dẫn đến mất dữ liệu đơn hàng của bạn"
     }
+  },
+  "Footer": {
+    "brand-logo": "Nhà hàng NetxEat",
+    "about": "Về chúng tôi",
+    "terms-of-service": "Điều khoản dịch vụ",
+    "privacy-policy": "Chính sách bảo mật"
   }
 }

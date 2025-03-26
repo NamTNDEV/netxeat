@@ -74,5 +74,11 @@
       "logoutCancel": "Cancel",
       "logoutConfirm": "Logging out may result in losing your order data"
     }
+  },
+  "Footer": {
+    "brand-logo": "NetxEat Restaurant",
+    "about": "About Us",
+    "terms-of-service": "Terms of Service",
+    "privacy-policy": "Privacy Policy"
   }
 }
