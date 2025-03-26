@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import LoginForm from './login-form'
 import { Locale } from '@/configs/locale.configs'
 import configEnv from '@/configs/env.configs'
-import { htmlToTextForDescription } from '@/lib/utils'
+import { htmlToTextForDescription } from "@/lib/server-utils"
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: Locale }>

@@ -1,5 +1,6 @@
 import { dishApiServices } from '@/api/services/dishApi.services'
-import { executeApiRequest, generateSlugUrl, getIdFromSlug, htmlToTextForDescription } from '@/lib/utils'
+import { executeApiRequest, generateSlugUrl, getIdFromSlug } from '@/lib/utils'
+import { htmlToTextForDescription } from "@/lib/server-utils"
 import DishDetail from './dish-detail'
 import { Locale } from '@/configs/locale.configs'
 import { getTranslations, setRequestLocale } from 'next-intl/server'

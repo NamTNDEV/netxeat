@@ -12,7 +12,6 @@ import guestClientServices from "@/services/guestClient.services"
 import { format } from "date-fns"
 import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
 import slugify from 'slugify'
-import { convert } from "html-to-text"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -151,14 +150,6 @@ export const OrderStatusIcon = {
 
 export const generateSlugUrl = (name: string, id: number) => `${slugify(name)}-id.${id}`
 export const getIdFromSlug = (slug: string) => slug.split('-id.')[1]
-
-export const htmlToTextForDescription = (html: string) => {
-  return convert(html, {
-    limits: {
-      maxInputLength: 140
-    }
-  })
-}
 
 // Local Storage
 export const getAccessTokenFromLocalStorage = () => (typeof window !== "undefined") ? localStorage.getItem("accessToken") : null

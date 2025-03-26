@@ -1,6 +1,6 @@
 import { dishApiServices } from "@/api/services/dishApi.services"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { formatCurrency, generateSlugUrl, htmlToTextForDescription } from "@/lib/utils"
+import { formatCurrency, generateSlugUrl } from "@/lib/utils"
 import { DishListResType } from "@/schemaValidations/dish.schema"
 import { getTranslations, setRequestLocale } from "next-intl/server"
 import Image from "next/image"
@@ -8,6 +8,7 @@ import { Link } from '@/i18n/navigation'
 import { Locale } from "@/configs/locale.configs"
 import configEnv from "@/configs/env.configs"
 import { baseOpenGraph } from "@/shared-metadata"
+import { htmlToTextForDescription } from "@/lib/server-utils"
 
 export async function generateMetadata(props: { params: Promise<{ locale: Locale }> }) {
   const params = await props.params

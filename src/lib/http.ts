@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getAccessTokenFromLocalStorage, normalizePath, removeAccessTokenFromLocalStorage, removeRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from './utils'
 import configEnv from '@/configs/env.configs'
 import { LoginResType } from '@/schemaValidations/auth.schema'
+import Cookies from 'js-cookie'
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
     baseUrl?: string | undefined
@@ -130,7 +131,8 @@ const request = async <Response>(
                         removeAccessTokenFromLocalStorage()
                         removeRefreshTokenFromLocalStorage()
                         clientLogoutRequest = null
-                        location.href = '/login'
+                        const locale = Cookies.get('NEXT_LOCALE')
+                        location.href = `/${locale}/login`
                     }
                 }
             } else {
