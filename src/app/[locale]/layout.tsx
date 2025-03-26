@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { routing } from '@/i18n/routing'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { Locale } from '@/configs/locale.configs'
+import NextTopLoader from 'nextjs-toploader';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -44,6 +45,10 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)} data-gr-c-s-loaded='true'>
+        <NextTopLoader
+          showSpinner={false}
+          color='hsl(var(--foreground))'
+        />
         <NextIntlClientProvider>
           <AppProvider>
             {children}

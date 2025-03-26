@@ -17,6 +17,7 @@ import { useAuthStore } from '@/stores/auth.stores'
 import { useSocketStore } from '@/stores/socket.stores'
 import SearchParamsLoader, { useSearchParamsLoader } from '@/components/common/search-params-loader'
 import { useTranslations } from 'next-intl'
+import { LoaderCircle } from 'lucide-react'
 
 export default function LoginForm() {
   const t = useTranslations('Login')
@@ -105,6 +106,9 @@ export default function LoginForm() {
                 )}
               />
               <Button type='submit' className='w-full'>
+                {loginMutation.isPending && (
+                  <LoaderCircle className='w-5 h-5 mr-2 animate-spin' />
+                )}
                 {t('buttonLogin')}
               </Button>
               {/* <Button variant='outline' className='w-full' type='button'>
