@@ -4,10 +4,11 @@ import { cn } from '@/lib/utils'
 import AppProvider from '@/providers/app-provider'
 import { NextIntlClientProvider } from 'next-intl'
 import { routing } from '@/i18n/routing'
-import { getTranslations, setRequestLocale } from 'next-intl/server'
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server'
 import { Locale } from '@/configs/locale.configs'
 import NextTopLoader from 'nextjs-toploader';
 import Footer from '@/components/layouts/footer'
+import { notFound } from 'next/navigation'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -55,7 +56,11 @@ export default async function RootLayout(
     children
   } = props;
 
+  if (!routing.locales.includes(locale as any)) {
+    notFound()
+  }
   setRequestLocale(locale);
+  const messages = await getMessages()
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)} data-gr-c-s-loaded='true'>
@@ -63,7 +68,7 @@ export default async function RootLayout(
           showSpinner={false}
           color='hsl(var(--foreground))'
         />
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={messages}>
           <AppProvider>
             {children}
             <Footer />

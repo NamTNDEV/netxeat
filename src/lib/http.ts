@@ -1,3 +1,4 @@
+import { Locale } from '@/configs/locale.configs'
 import { getAccessTokenFromLocalStorage, normalizePath, removeAccessTokenFromLocalStorage, removeRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from './utils'
 import configEnv from '@/configs/env.configs'
 import { redirect } from '@/i18n/navigation'
@@ -114,6 +115,7 @@ const request = async <Response>(
                 }
             )
         } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
+            const locale = Cookies.get('NEXT_LOCALE') as Locale
             if (isClient) {
                 if (!clientLogoutRequest) {
                     clientLogoutRequest = fetch('/api/auth/logout', {
@@ -131,7 +133,6 @@ const request = async <Response>(
                         removeAccessTokenFromLocalStorage()
                         removeRefreshTokenFromLocalStorage()
                         clientLogoutRequest = null
-                        const locale = Cookies.get('NEXT_LOCALE')
                         location.href = `/${locale}/login`
                     }
                 }
@@ -139,7 +140,7 @@ const request = async <Response>(
                 const accessToken = (options?.headers as any)?.Authorization.split(
                     'Bearer '
                 )[1]
-                redirect({ href: `/logout?accessToken=${accessToken}`, locale: Cookies.get('NEXT_LOCALE') as "en" | "vi" })
+                redirect({ href: `/logout?accessToken=${accessToken}`, locale })
             }
         } else {
             throw new HttpError(data)
