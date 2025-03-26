@@ -66,7 +66,7 @@ export default async function Home(props: {
           src='/banner.jpg'
           width={1200}
           height={620}
-          quality={100}
+          quality={80}
           alt='Banner'
           priority
           className='absolute top-0 left-0 w-full h-full object-cover'
@@ -96,7 +96,8 @@ export default async function Home(props: {
                         <Image
                           width={200}
                           height={200}
-                          quality={100}
+                          quality={80}
+                          loading="lazy"
                           alt={dishItem.name}
                           src={dishItem.image}
                           className="w-full h-full object-cover"

@@ -49,7 +49,8 @@ const OrderItem = ({ order, index }: { order: any; index: number }) => {
                             alt={order.dishSnapshot.name}
                             height={100}
                             width={100}
-                            quality={100}
+                            quality={80}
+                            loading="lazy"
                             className="object-cover w-[90px] h-[90px] rounded-lg"
                         />
                     </div>

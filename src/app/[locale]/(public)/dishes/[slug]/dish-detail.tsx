@@ -21,7 +21,8 @@ const DishDetail = ({ dish }: { dish: DishResType['data'] | undefined }) => {
                     src={dish.image}
                     width={360}
                     height={360}
-                    quality={100}
+                    quality={80}
+                    loading="lazy"
                     alt={dish.name}
                     title={dish.name}
                     className="object-cover rounded-lg shadow-xl w-full max-w-[360px] h-[360px]"

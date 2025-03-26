@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation'
 import { getAccessTokenFromLocalStorage, normalizePath, removeAccessTokenFromLocalStorage, removeRefreshTokenFromLocalStorage, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from './utils'
 import configEnv from '@/configs/env.configs'
+import { redirect } from '@/i18n/navigation'
 import { LoginResType } from '@/schemaValidations/auth.schema'
 import Cookies from 'js-cookie'
 
@@ -139,7 +139,7 @@ const request = async <Response>(
                 const accessToken = (options?.headers as any)?.Authorization.split(
                     'Bearer '
                 )[1]
-                redirect(`/logout?accessToken=${accessToken}`)
+                redirect({ href: `/logout?accessToken=${accessToken}`, locale: Cookies.get('NEXT_LOCALE') as "en" | "vi" })
             }
         } else {
             throw new HttpError(data)

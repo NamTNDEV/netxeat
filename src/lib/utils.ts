@@ -3,7 +3,7 @@ import { UseFormSetError } from "react-hook-form"
 import { twMerge } from "tailwind-merge"
 import { EntityError } from "./http"
 import { toast } from "sonner"
-import jwt from "jsonwebtoken"
+import { jwtDecode } from 'jwt-decode'
 import authClientServices from "@/services/authClient.services"
 import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type"
 import configEnv from "@/configs/env.configs"
@@ -12,6 +12,7 @@ import guestClientServices from "@/services/guestClient.services"
 import { format } from "date-fns"
 import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
 import slugify from 'slugify'
+import { defaultLocale } from "@/configs/locale.configs"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -86,7 +87,7 @@ export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof type
 }
 
 export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
-  return configEnv.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
+  return configEnv.NEXT_PUBLIC_URL + `${defaultLocale}/tables/` + tableNumber + '?token=' + token
 }
 
 export const getStatusIcon = (status: string) => {
@@ -162,7 +163,7 @@ export const clearLocalStorage = () => (typeof window !== "undefined") && localS
 
 // JWT
 export const decodeToken = (token: string) => {
-  return jwt.decode(token) as TokenPayloadType
+  return jwtDecode(token) as TokenPayloadType
 }
 
 export const checkAndRefreshToken = async (handler?: {
